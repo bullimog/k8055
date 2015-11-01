@@ -27,7 +27,7 @@ class Application extends Controller {
   def addDevice(id:String, description: String, deviceType: Int, port: Int) = Action.async {
     implicit request => {
       DeviceCache.addDevice(id, description, deviceType, port)
-      Future.successful(Ok())
+      Future.successful(Ok("Done"))
     }
   }
 
