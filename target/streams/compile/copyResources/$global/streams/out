@@ -1,4 +1,0 @@
-[0m[[0mdebug[0m] [0mCopy resource mappings: [0m
-[0m[[0mdebug[0m] [0m	(/home/graeme/projects/k8055/conf/logback.xml,/home/graeme/projects/k8055/target/scala-2.11/classes/logback.xml)[0m
-[0m[[0mdebug[0m] [0m	(/home/graeme/projects/k8055/conf/application.conf,/home/graeme/projects/k8055/target/scala-2.11/classes/application.conf)[0m
-[0m[[0mdebug[0m] [0m	(/home/graeme/projects/k8055/conf/routes,/home/graeme/projects/k8055/target/scala-2.11/classes/routes)[0m
