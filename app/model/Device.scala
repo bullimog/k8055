@@ -35,7 +35,7 @@ object Device {
 }
 
 object DeviceCache {
-  //  var devices: List[Device] = ???
+  var emptyDevices: mutable.MutableList[Device] = mutable.MutableList()
 
   import Device._
   var devices: mutable.MutableList[Device] = {
@@ -45,10 +45,8 @@ object DeviceCache {
     )
   }
 
-  def addDevice(id: String, description: String, deviceType: Int, port: Int):Boolean = {
-
-    devices = devices += Device(id, description, deviceType, port, None, None, None, None,None, None, None)
-    true
+  def addDevice(device:Device) = {
+    devices = devices += device
   }
 
 
