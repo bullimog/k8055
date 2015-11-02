@@ -24,12 +24,27 @@ class Application extends Controller {
     }
   }
 
-  def addDevice(id:String, description: String, deviceType: Int, port: Int) = Action.async {
+  def addDevice1() = Action.async(parse.json) {
     implicit request => {
-      DeviceCache.addDevice(id, description, deviceType, port)
-      Future.successful(Ok("Done"))
+      (request.body \ "name").asOpt[String].map { name =>
+        Future.successful(Ok("Hello " + name))
+      }.getOrElse {
+        Future.successful(BadRequest("Missing parameter [name]"))
+      }
+
+      //      Future.successful(Ok("Done"))
     }
   }
 
+  def addDevice() = Action.async(parse.json) {
+    implicit request => request.body.validate[Device].fold(
+      errors => {
+        Future.successful(BadRequest(Json.obj("status" ->"KO", "message" -> JsError.toJson(errors))))
+      },
+      device => {
+        Future.successful(Ok(Json.obj("status" ->"OK", "message" -> ("Place '"+device.description+"' saved.") )))
+      }
+    )
 
+  }
 }
