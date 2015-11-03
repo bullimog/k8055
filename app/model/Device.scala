@@ -34,6 +34,7 @@ object Device {
   implicit val deviceWrites = Json.writes[Device]
 }
 
+
 object DeviceCache {
   var emptyDevices: mutable.MutableList[Device] = mutable.MutableList()
 
