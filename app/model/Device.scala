@@ -7,7 +7,8 @@ import play.api.libs.json.{Json, JsPath, Reads}
 
 case class Device(id: String, description: String, deviceType: Int, port:Int, units:Option[String],
                   conversionFactor:Option[Double], conversionOffset:Option[Double], decimalPlaces:Option[Int],
-                  monitorSensor:Option[String], monitorIncreaser:Option[String], monitorDecreaser:Option[String])
+                  monitorSensor:Option[String], monitorIncreaser:Option[String], monitorDecreaser:Option[String],
+                   digitalState:Option[Boolean] = None, analogueState:Option[Int] = None)
 
 object Device {
   val TIMER = 0         // e.g. Clock
@@ -28,7 +29,9 @@ object Device {
       (JsPath \ "decimalPlaces").readNullable[Int] and
       (JsPath \ "monitorSensor").readNullable[String] and
       (JsPath \ "monitorIncreaser").readNullable[String] and
-      (JsPath \ "monitorDecreaser").readNullable[String]
+      (JsPath \ "monitorDecreaser").readNullable[String] and
+      (JsPath \ "digitalState").readNullable[Boolean] and
+      (JsPath \ "analogueState").readNullable[Int]
     )(Device.apply _)
 
   implicit val deviceWrites = Json.writes[Device]

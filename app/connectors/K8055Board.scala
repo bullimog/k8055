@@ -5,27 +5,12 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait K8055Board {
-//  def setDigitalOut(d: Int, state: Boolean): Unit
-//  def getDigitalOut(d: Int): Boolean
-  def getAnalogueIn(d: Int): Double
-//  def setAnalogueIn(d: Int, value: Double): Unit
-//  def setDigitalIn(d: Int, state: Boolean): Unit
-//  def getDigitalIn(d: Int): Boolean
-  def getAnalogueOut(d: Int): Int
-  def getAnaloguePercentageOut(d: Int): Int
-  def setAnalogueOut(d: Int, value: Int): Unit
-  def setAnaloguePercentageOut(d: Int, value: Int): Unit
-//  def getCount(d: Int): Int
-//  def setCount(i: Int, value:Int): Unit
-//  def resetCount(d: Int): Unit
-}
-
+object K8055Board extends K8055Board
 
 /***********************************************************************
  K8055Board: trait for the real thing
   ************************************************************************/
-object K8055Board extends K8055Board{
+trait K8055Board{
 
   // can't read output settings from card, so need to cache state here...
   var digitalOut:Byte = 0
@@ -47,8 +32,8 @@ object K8055Board extends K8055Board{
   /** *******************************************************
     * Analogue Out
     **********************************************************/
-  override def getAnaloguePercentageOut(channel:Int): Int ={getAnAnalogueOut(channel, percentToStoreFactor)}
-  override def getAnalogueOut(channel:Int): Int ={getAnAnalogueOut(channel, byteToStoreFactor)}
+  def getAnaloguePercentageOut(channel:Int): Int ={getAnAnalogueOut(channel, percentToStoreFactor)}
+  def getAnalogueOut(channel:Int): Int ={getAnAnalogueOut(channel, byteToStoreFactor)}
   def getAnAnalogueOut(channel:Int, factor: Double): Int ={
     channel match {
       case 1 => (analogueOut1 / factor).toInt
@@ -57,8 +42,8 @@ object K8055Board extends K8055Board{
     }
   }
 
-  override def setAnaloguePercentageOut(channel:Int, value:Int): Unit ={setAnAnalogueOut(channel, value, percentToStoreFactor)}
-  override def setAnalogueOut(channel:Int, value:Int): Unit ={setAnAnalogueOut(channel, value, byteToStoreFactor)}
+  def setAnaloguePercentageOut(channel:Int, value:Int): Unit ={setAnAnalogueOut(channel, value, percentToStoreFactor)}
+  def setAnalogueOut(channel:Int, value:Int): Unit ={setAnAnalogueOut(channel, value, byteToStoreFactor)}
   def setAnAnalogueOut(channel:Int, value:Int, factor:Double): Unit ={
     channel match{
       case 1 => analogueOut1 = (value * factor).toInt
@@ -71,9 +56,9 @@ object K8055Board extends K8055Board{
   /** *******************************************************
     * Analogue In
     **********************************************************/
-  override def getAnalogueIn(i:Int): Double ={readAnalogueChannel(i)}
+  //def getAnalogueIn(i:Int): Int ={readAnalogueChannel(i)}
 
-  def readAnalogueChannel(channel:Int):Int = {
+  def getAnalogueIn(channel:Int):Int = {
     (channel, readStatus()) match{
       case (1, Some(status)) => status(K8055_ANALOG_1)
       case (2, Some(status)) => status(K8055_ANALOG_2)
@@ -93,7 +78,11 @@ object K8055Board extends K8055Board{
     val retValues = executeCommand(s"k8055").replaceAll("\n","").split(';')
     try {
       val expectedValCount = 6
-      if (retValues.length == expectedValCount) {Some(for (strValue <- retValues) yield {strValue.toInt})}
+      if (retValues.length == expectedValCount) {
+        Some(for (strValue <- retValues)
+             yield {strValue.toInt}
+        )
+      }
       else None
     }
     catch {
@@ -112,7 +101,6 @@ object K8055Board extends K8055Board{
   }
 
   def executeCommand(command:String): String = {
-    //println("executeCommand: "+command)
     import sys.process.Process
     try{
       val result = Process(""+command+"")
@@ -126,4 +114,3 @@ object K8055Board extends K8055Board{
     }
   }
 }
-

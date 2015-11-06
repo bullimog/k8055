@@ -19,25 +19,33 @@ class Application extends Controller {
     }
   }
 
-  def getDevice(id:String) = Action.async {
-    implicit request => {
-      val json = Json.toJson(DeviceCache.devices.filter(device => device.id == id))
-      Future.successful(Ok(json))
-    }
-  }
+//  def getDevice(id:String) = Action.async {
+//    implicit request => {
+//      val json = Json.toJson(DeviceCache.devices.filter(device => device.id == id))
+//      Future.successful(Ok(json))
+//    }
+//  }
 
-  def readDevice(id:String) = Action.async(parse.json) {
+  def getDevice(id:String) = Action.async(parse.json) {
     implicit request => {
+      //Maybe find a device with the specified id
       val device:Option[Device] = DeviceCache.devices.find(device => device.id == id)
 
+      //When a device is found, check its type, populate the transient data and return it.
       device.fold(Future.successful(BadRequest(Json.obj("result" -> "Can't find device")))) (
         d => d.deviceType match{
-          case Device.ANALOGUE_IN => Future.successful(Ok(Json.obj("result" -> K8055Board.getAnalogueIn(d.port))))
+          case Device.ANALOGUE_IN => readAnalogueIn(d)
           case _ => Future.successful(BadRequest(Json.obj("result" -> "Can't read from device")))
         }
       )
     }
   }
+
+  private def readAnalogueIn(device: Device) = {
+    val json = Json.toJson(device.copy(analogueState = Some(K8055Board.getAnalogueIn(device.port))))
+    Future.successful(Ok(json))
+  }
+
 
   def addDevice() = Action.async(parse.json) {
     implicit request => request.body.validate[Device].fold(

@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.allDevices
+GET     /devices                    controllers.Application.allDevices
 GET     /device/:id                 controllers.Application.getDevice(id: String)
 POST    /device                     controllers.Application.addDevice
 PUT     /device                     controllers.Application.updateDevice
