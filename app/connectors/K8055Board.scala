@@ -29,6 +29,9 @@ trait K8055Board{
   val K8055_COUNTER_1 = 4
   val K8055_COUNTER_2 = 5
 
+  val LOWEST_BIT = 1
+  val HIGHEST_BIT = 8
+
   /** *******************************************************
     * Analogue Out
     **********************************************************/
@@ -64,6 +67,75 @@ trait K8055Board{
       case (2, Some(status)) => status(K8055_ANALOG_2)
       case _ => 0
     }
+  }
+
+  /** ********************************************************
+    * Digital Out
+    **********************************************************/
+  def getDigitalOut(channel:Int): Boolean ={
+    if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT){
+      (digitalOut & byteMask(channel)) > 0
+    }
+    else{false}
+  }
+
+  def setDigitalOut(channel:Int, isOn:Boolean): Unit ={
+    if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT) {
+      if (isOn) setDigitalChannel(channel)
+      else clearDigitalChannel(channel)
+    }
+  }
+
+  //converts 1-8 to a binary digit
+  def byteMask(i:Int): Int = {
+    math.pow(2,i-1).toInt
+  }
+
+
+  def setDigitalChannel(channel:Int):Unit = {
+    if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT) {
+      digitalOut = (digitalOut | byteMask(channel)).toByte
+      setStatus()
+    }
+  }
+
+  def clearDigitalChannel(channel:Int):Unit = {
+    if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT) {
+      digitalOut = (digitalOut & (255 - byteMask(channel))).toByte
+      setStatus()
+    }
+  }
+
+
+  /** ********************************************************
+    * Digital In
+    **********************************************************/
+  private def andBitsTogether(source:Int, mask:Int): Boolean = {
+    if((source & mask) > 0) true
+    else false
+  }
+
+  def getDigitalIn(channel:Int): Boolean ={
+    readStatus().fold(false)(status => andBitsTogether(status(K8055_DIGITAL).toByte, byteMask(channel)))
+  }
+
+  def getCount(channel: Int): Int = {
+    (channel, readStatus()) match{
+      case (1, Some(status)) => status(K8055_COUNTER_1)
+      case (2, Some(status)) => status(K8055_COUNTER_2)
+      case _ => {
+        println("Can only get count from channels 1 & 2, not "+channel)
+        0
+      }
+    }
+  }
+
+  def resetCount(channel: Int): Unit = {executeCommand(s"k8055 -reset$channel")}
+
+  def getDigitalInLatch(channel: Int):Boolean = {
+    val pressed:Boolean = getCount(channel) > 0
+    resetCount(channel)
+    pressed
   }
 
 
