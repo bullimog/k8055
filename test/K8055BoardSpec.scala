@@ -7,7 +7,7 @@ import play.api.test._
 
 
 @RunWith(classOf[JUnitRunner])
-class K8055Spec extends Specification {
+class K8055BoardSpec extends Specification {
 
   val k8055Board = new K8055Board {
     var lastCommand:String = ""
@@ -24,20 +24,22 @@ class K8055Spec extends Specification {
       k8055Board.setAnalogueOut(1, 255)
       k8055Board.getAnalogueOut(1) must equalTo(255)
       k8055Board.lastCommand must equalTo("k8055 -d:0 -a1:255 -a2:0")
+      k8055Board.analogueOut1 must equalTo(25500)
 
 
       k8055Board.setAnaloguePercentageOut(1, 50)
       k8055Board.getAnaloguePercentageOut(1) must equalTo(50)
       k8055Board.getAnAnalogueOut(1, 100) must equalTo(127)
       k8055Board.lastCommand must equalTo("k8055 -d:0 -a1:127 -a2:0")
+      k8055Board.analogueOut1 must equalTo(12750)
 
 
-      k8055Board.fakeBoardResponse = "8055;24;25;26;27;28"  //just some numbers to match against
+      k8055Board.fakeBoardResponse = "0;24;25;26;27;28"  //just some numbers to match against
       k8055Board.getAnalogueIn(1) must equalTo(25)
       k8055Board.getAnalogueIn(2) must equalTo(26)
       k8055Board.lastCommand must equalTo("k8055")
 
-      k8055Board.readStatus().get must beEqualTo(Array(8055,24,25,26,27,28))
+      k8055Board.readStatus().get must beEqualTo(Array(0,24,25,26,27,28))
     }
   }
 
@@ -109,8 +111,8 @@ class K8055Spec extends Specification {
 
   "K8055Board" should {
     "set the right values, when digital in methods are called" in {
-      k8055Board.fakeBoardResponse = "8055;0;0;0;0;0"
-//      k8055Board.setDigitalOut(1, true)
+      k8055Board.fakeBoardResponse = "0;0;0;0;0;0"
+      k8055Board.getDigitalIn(0) must equalTo(false)
       k8055Board.getDigitalIn(1) must equalTo(false)
       k8055Board.getDigitalIn(2) must equalTo(false)
       k8055Board.getDigitalIn(3) must equalTo(false)
@@ -119,7 +121,9 @@ class K8055Spec extends Specification {
       k8055Board.getDigitalIn(6) must equalTo(false)
       k8055Board.getDigitalIn(7) must equalTo(false)
       k8055Board.getDigitalIn(8) must equalTo(false)
-      k8055Board.fakeBoardResponse = "8055;255;0;0;0;0"
+      k8055Board.getDigitalIn(9) must equalTo(false)
+      k8055Board.fakeBoardResponse = "0;255;0;0;0;0"
+      k8055Board.getDigitalIn(0) must equalTo(false)
       k8055Board.getDigitalIn(1) must equalTo(true)
       k8055Board.getDigitalIn(2) must equalTo(true)
       k8055Board.getDigitalIn(3) must equalTo(true)
@@ -128,17 +132,18 @@ class K8055Spec extends Specification {
       k8055Board.getDigitalIn(6) must equalTo(true)
       k8055Board.getDigitalIn(7) must equalTo(true)
       k8055Board.getDigitalIn(8) must equalTo(true)
+      k8055Board.getDigitalIn(9) must equalTo(false)
 
       k8055Board.resetCount(1)
       k8055Board.lastCommand must equalTo("k8055 -reset1")
 
-      k8055Board.fakeBoardResponse = "8055;0;0;0;7;8"
+      k8055Board.fakeBoardResponse = "0;0;0;0;7;8"
       k8055Board.getCount(1) must equalTo(7)
       k8055Board.getCount(2) must equalTo(8)
 
       k8055Board.getDigitalInLatch(1) must equalTo(true)
       k8055Board.lastCommand must equalTo("k8055 -reset1")
-      k8055Board.fakeBoardResponse = "8055;0;0;0;0;0"
+      k8055Board.fakeBoardResponse = "0;0;0;0;0;0"
       k8055Board.getCount(1) must equalTo(0)
       k8055Board.getDigitalInLatch(1) must equalTo(false)
 

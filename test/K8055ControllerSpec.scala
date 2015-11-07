@@ -8,7 +8,7 @@ import play.api.test.Helpers._
 
 
 @RunWith(classOf[JUnitRunner])
-class ApplicationSpec extends Specification {
+class K8055ControllerSpec extends Specification {
 
   "Application" should {
 
@@ -24,4 +24,6 @@ class ApplicationSpec extends Specification {
       contentAsString(home) must contain ("pump")
     }
   }
+
+
 }

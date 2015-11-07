@@ -5,10 +5,10 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{Json, JsPath, Reads}
 
 
-case class Device(id: String, description: String, deviceType: Int, port:Int, units:Option[String],
+case class Device(id: String, description: String, deviceType: Int, channel:Int, units:Option[String],
                   conversionFactor:Option[Double], conversionOffset:Option[Double], decimalPlaces:Option[Int],
                   monitorSensor:Option[String], monitorIncreaser:Option[String], monitorDecreaser:Option[String],
-                   digitalState:Option[Boolean] = None, analogueState:Option[Int] = None)
+                  digitalState:Option[Boolean] = None, analogueState:Option[Int] = None)
 
 object Device {
   val TIMER = 0         // e.g. Clock
@@ -22,7 +22,7 @@ object Device {
     (JsPath \ "id").read[String] and
       (JsPath \ "description").read[String] and
       (JsPath \ "deviceType").read[Int] and
-      (JsPath \ "port").read[Int] and
+      (JsPath \ "channel").read[Int] and
       (JsPath \ "units").readNullable[String] and
       (JsPath \ "conversionFactor").readNullable[Double] and
       (JsPath \ "conversionOffset").readNullable[Double] and

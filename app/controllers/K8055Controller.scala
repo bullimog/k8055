@@ -9,7 +9,7 @@ import play.api.libs.json._
 import scala.collection.mutable
 import scala.concurrent.Future
 
-class Application extends Controller {
+class K8055Controller extends Controller {
 
 
   def allDevices() = Action.async {
@@ -34,17 +34,41 @@ class Application extends Controller {
       //When a device is found, check its type, populate the transient data and return it.
       device.fold(Future.successful(BadRequest(Json.obj("result" -> "Can't find device")))) (
         d => d.deviceType match{
-          case Device.ANALOGUE_IN => readAnalogueIn(d)
+          case Device.ANALOGUE_IN => returnPopulatedDevice(d, populateAnalogueIn)
+          case Device.ANALOGUE_OUT => returnPopulatedDevice(d, populateAnalogueOut)
+          case Device.DIGITAL_IN => returnPopulatedDevice(d, populateDigitalIn)
+          case Device.DIGITAL_OUT => returnPopulatedDevice(d, populateDigitalOut)
           case _ => Future.successful(BadRequest(Json.obj("result" -> "Can't read from device")))
         }
       )
     }
   }
 
-  private def readAnalogueIn(device: Device) = {
-    val json = Json.toJson(device.copy(analogueState = Some(K8055Board.getAnalogueIn(device.port))))
+  def returnPopulatedDevice(device: Device, fn: Device => Device):Future[Result] = {
+    val json = Json.toJson(fn(device))
     Future.successful(Ok(json))
   }
+
+  //Populate the case class with AnalogueIn data
+  def populateAnalogueIn (device: Device):Device = {
+    device.copy(analogueState = Some(K8055Board.getAnalogueIn(device.channel)))
+  }
+
+  //Populate the case class with AnalogueOut data
+  def populateAnalogueOut(device: Device):Device = {
+    device.copy(analogueState = Some(K8055Board.getAnalogueOut(device.channel)))
+  }
+
+  //Populate the case class with DigitalOut data
+  def populateDigitalIn(device: Device):Device = {
+    device.copy(digitalState = Some(K8055Board.getDigitalIn(device.channel)))
+  }
+
+  //Populate the case class with DigitalOut data
+  def populateDigitalOut(device: Device):Device = {
+    device.copy(digitalState = Some(K8055Board.getDigitalOut(device.channel)))
+  }
+
 
 
   def addDevice() = Action.async(parse.json) {

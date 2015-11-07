@@ -20,9 +20,7 @@ trait K8055Board{
   val percentToStoreFactor:Int = 255   // 1% = 255 in the (0 to 25,500) store
   val byteToStoreFactor:Int = 100      // 1 bit = 100 in the store
 
-  val K8055_PORT = 0
-  val K8055_TIME = 0
-
+  val K8055_TIMESTAMP = 0
   val K8055_DIGITAL = 1
   val K8055_ANALOG_1 = 2
   val K8055_ANALOG_2 = 3
@@ -116,7 +114,10 @@ trait K8055Board{
   }
 
   def getDigitalIn(channel:Int): Boolean ={
-    readStatus().fold(false)(status => andBitsTogether(status(K8055_DIGITAL).toByte, byteMask(channel)))
+    if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT) {
+      readStatus().fold(false)(status => andBitsTogether(status(K8055_DIGITAL).toByte, byteMask(channel)))
+    }
+    else false
   }
 
   def getCount(channel: Int): Int = {
