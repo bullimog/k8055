@@ -84,7 +84,7 @@ trait K8055Board{
     }
   }
 
-  //converts 1-8 to a binary digit
+  //converts 1-8 to a binary digit mask
   def byteMask(i:Int): Int = {
     math.pow(2,i-1).toInt
   }

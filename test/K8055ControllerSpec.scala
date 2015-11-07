@@ -1,10 +1,17 @@
 import connector.K8055Board
+import controllers.{routes, K8055Controller}
+import model.{DeviceCache, Device}
+import model.Device._
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
+import play.api.libs.json.Json
+import play.api.mvc.Cookie
 
 import play.api.test._
 import play.api.test.Helpers._
+
+import scala.concurrent.Future
 
 
 @RunWith(classOf[JUnitRunner])
@@ -21,9 +28,49 @@ class K8055ControllerSpec extends Specification {
 
       status(home) must equalTo(OK)
       contentType(home) must beSome.which(_ == "application/json")
-      contentAsString(home) must contain ("pump")
+      //contentAsString(home) must contain ("pump")
     }
+
+    "add a Digital Out device" in new WithApplication {
+      val pump = Device("DO-1", "pump", DIGITAL_OUT, 1)
+      testComponent(pump)
+    }
+
+    "add a Analogue Out device" in new WithApplication {
+      val heater = Device("AO-1", "heater", ANALOGUE_OUT, 1, Some("%"), Some(0))
+      testComponent(heater)
+    }
+
+    "add a Digital In device" in new WithApplication {
+      val switch = Device("DI-1", "switch", DIGITAL_IN, 1)
+      testComponent(switch)
+    }
+
+    "add a Analogue In device" in new WithApplication {
+      val thermometer = Device("AO-1", "thermometer", ANALOGUE_IN, 1, Some("%"), Some(0))
+      testComponent(thermometer)
+    }
+
+
+
+
+//    val result = K8055Controller.createGroup()(fakeRequest).result.value.get
   }
 
+  def testComponent(device:Device) = {
+    val jDevice = Json.toJson(device)
 
+    val req = FakeRequest(method = "POST", uri = controllers.routes.K8055Controller.addDevice().url,
+      headers = FakeHeaders(Seq("Content-type"->"application/json")), body =  jDevice)
+
+    val Some(result) = route(req)
+    status(result) must equalTo(OK)
+
+    val home = route(FakeRequest(GET, "/")).get
+    status(home) must equalTo(OK)
+    contentType(home) must beSome.which(_ == "application/json")
+    contentAsString(home) must contain (device.description)
+
+    //println(""+contentAsJson(home))
+  }
 }

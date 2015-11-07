@@ -5,9 +5,10 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{Json, JsPath, Reads}
 
 
-case class Device(id: String, description: String, deviceType: Int, channel:Int, units:Option[String],
-                  conversionFactor:Option[Double], conversionOffset:Option[Double], decimalPlaces:Option[Int],
-                  monitorSensor:Option[String], monitorIncreaser:Option[String], monitorDecreaser:Option[String],
+case class Device(id: String, description: String, deviceType: Int, channel:Int, units:Option[String] = None,
+                  conversionFactor:Option[Double] = None, conversionOffset:Option[Double] = None,
+                  decimalPlaces:Option[Int] = None, monitorSensor:Option[String] = None,
+                  monitorIncreaser:Option[String] = None, monitorDecreaser:Option[String] = None,
                   digitalState:Option[Boolean] = None, analogueState:Option[Int] = None)
 
 object Device {
@@ -36,27 +37,3 @@ object Device {
 
   implicit val deviceWrites = Json.writes[Device]
 }
-
-
-object DeviceCache {
-  var emptyDevices: mutable.MutableList[Device] = mutable.MutableList()
-
-  import Device._
-  var devices: mutable.MutableList[Device] = {
-    mutable.MutableList(
-      Device("1", "pump", DIGITAL_OUT, 1, None, None, None, None, None, None, None),
-      Device("2", "heater", ANALOGUE_OUT, 1, Some("%"), None, None, None, None, None, None)
-    )
-  }
-
-  def addDevice(device:Device) = {
-    devices = devices += device
-  }
-
-
-
-}
-
-
-
-//case class DeviceCollection(name: String, devices: List[Device]){}
