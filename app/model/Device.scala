@@ -1,5 +1,7 @@
 package model
 
+import connector.K8055Board
+
 import scala.collection.mutable
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Json, JsPath, Reads}
@@ -36,4 +38,25 @@ object Device {
     )(Device.apply _)
 
   implicit val deviceWrites = Json.writes[Device]
+
+  //Populate the case class with AnalogueIn data
+  def populateAnalogueIn (device: Device):Device = {
+    device.copy(analogueState = Some(K8055Board.getAnalogueIn(device.channel)))
+  }
+
+  //Populate the case class with AnalogueOut data
+  def populateAnalogueOut(device: Device):Device = {
+    device.copy(analogueState = Some(K8055Board.getAnalogueOut(device.channel)))
+  }
+
+  //Populate the case class with DigitalOut data
+  def populateDigitalIn(device: Device):Device = {
+    device.copy(digitalState = Some(K8055Board.getDigitalIn(device.channel)))
+  }
+
+  //Populate the case class with DigitalOut data
+  def populateDigitalOut(device: Device):Device = {
+    device.copy(digitalState = Some(K8055Board.getDigitalOut(device.channel)))
+  }
+
 }
