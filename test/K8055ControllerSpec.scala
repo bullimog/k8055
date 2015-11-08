@@ -1,11 +1,11 @@
 import connector.K8055Board
-import controllers.{routes, K8055Controller}
-import model.{DeviceCache, Device}
+
+import model.{Device, DeviceCollection}
 import model.Device._
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.Cookie
 
 import play.api.test._
@@ -33,22 +33,22 @@ class K8055ControllerSpec extends Specification {
 
     "add a Digital Out device" in new WithApplication {
       val pump = Device("DO-1", "pump", DIGITAL_OUT, 1)
-      testComponent(pump)
+      testDeviceAdd(pump)
     }
 
-    "add a Analogue Out device" in new WithApplication {
+    "add an Analogue Out device" in new WithApplication {
       val heater = Device("AO-1", "heater", ANALOGUE_OUT, 1, Some("%"), Some(0))
-      testComponent(heater)
+      testDeviceAdd(heater)
     }
 
     "add a Digital In device" in new WithApplication {
       val switch = Device("DI-1", "switch", DIGITAL_IN, 1)
-      testComponent(switch)
+      testDeviceAdd(switch)
     }
 
-    "add a Analogue In device" in new WithApplication {
+    "add an Analogue In device" in new WithApplication {
       val thermometer = Device("AO-1", "thermometer", ANALOGUE_IN, 1, Some("%"), Some(0))
-      testComponent(thermometer)
+      testDeviceAdd(thermometer)
     }
 
 
@@ -57,7 +57,7 @@ class K8055ControllerSpec extends Specification {
 //    val result = K8055Controller.createGroup()(fakeRequest).result.value.get
   }
 
-  def testComponent(device:Device) = {
+  def testDeviceAdd(device:Device) = {
     val jDevice = Json.toJson(device)
 
     val req = FakeRequest(method = "POST", uri = controllers.routes.K8055Controller.addDevice().url,
@@ -70,6 +70,15 @@ class K8055ControllerSpec extends Specification {
     status(home) must equalTo(OK)
     contentType(home) must beSome.which(_ == "application/json")
     contentAsString(home) must contain (device.description)
+    contentAsString(home) must contain (device.id)
+
+    val json: JsValue = Json.parse(contentAsString(home))
+    val dc:DeviceCollection = json.validate[DeviceCollection] match {
+      case s: JsSuccess[DeviceCollection] => s.get
+      case e: JsError => println("jsError: "+e ); DeviceCollection("None", "Empty", List())
+    }
+    dc.devices.contains(device) must equalTo(true)
+
 
     //println(""+contentAsJson(home))
   }

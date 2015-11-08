@@ -2,7 +2,8 @@ package controllers
 
 
 import connector.K8055Board
-import model.{DeviceCache, Device}
+import connectors.ConfigIO
+import model.{DeviceCollection, Device}
 import play.api.mvc._
 import play.api.libs.json._
 
@@ -12,10 +13,16 @@ import scala.concurrent.Future
 class K8055Controller extends Controller {
 
 
-  def allDevices() = Action.async {
+  def deviceCollection() = Action.async {
     implicit request => {
-      val json = Json.toJson(DeviceCache.devices)
+      val json = Json.toJson(DeviceCollection.getDeviceCollection())
       Future.successful(Ok(json))
+
+//      val oDeviceCollection:Option[DeviceCollection] = ConfigIO.readDeviceCollectionFromFile("devices.json")
+//      oDeviceCollection.fold(Future.successful(Ok("None Found!!"))) ({
+//        deviceCollection => val json = Json.toJson(deviceCollection.devices)
+//          Future.successful(Ok(json))
+//      })
     }
   }
 
@@ -29,7 +36,8 @@ class K8055Controller extends Controller {
   def getDevice(id:String) = Action.async(parse.json) {
     implicit request => {
       //Maybe find a device with the specified id
-      val device:Option[Device] = DeviceCache.devices.find(device => device.id == id)
+      val deviceCollection = DeviceCollection.getDeviceCollection()
+      val device:Option[Device] = deviceCollection.devices.find(device => device.id == id)
 
       //When a device is found, check its type, populate the transient data and return it.
       device.fold(Future.successful(BadRequest(Json.obj("result" -> "Can't find device")))) (
@@ -75,7 +83,7 @@ class K8055Controller extends Controller {
     implicit request => request.body.validate[Device].fold(
       errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       device => {
-        DeviceCache.addDevice(device)
+        DeviceCollection.addDevice(device)
         Future.successful(Ok(Json.obj("message" -> ("Device '"+device.description+"' saved.") )))
       }
     )
@@ -85,7 +93,7 @@ class K8055Controller extends Controller {
     implicit request => request.body.validate[Device].fold(
       errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       device => {
-        DeviceCache.addDevice(device)
+        DeviceCollection.addDevice(device)
         Future.successful(Ok(Json.obj("message" -> ("Device '"+device.description+"' saved.") )))
       }
     )
