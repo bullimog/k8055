@@ -1,42 +1,24 @@
 package controllers
 
-
 import connector.K8055Board
-import connectors.ConfigIO
 import model.{DeviceCollection, Device}
 import play.api.mvc._
 import play.api.libs.json._
-
-import scala.collection.mutable
 import scala.concurrent.Future
 
 class K8055Controller extends Controller {
 
-
   def deviceCollection() = Action.async {
     implicit request => {
-      val json = Json.toJson(DeviceCollection.getDeviceCollection())
+      val json = Json.toJson(DeviceCollection.getDeviceCollection)
       Future.successful(Ok(json))
-
-//      val oDeviceCollection:Option[DeviceCollection] = ConfigIO.readDeviceCollectionFromFile("devices.json")
-//      oDeviceCollection.fold(Future.successful(Ok("None Found!!"))) ({
-//        deviceCollection => val json = Json.toJson(deviceCollection.devices)
-//          Future.successful(Ok(json))
-//      })
     }
   }
 
-//  def getDevice(id:String) = Action.async {
-//    implicit request => {
-//      val json = Json.toJson(DeviceCache.devices.filter(device => device.id == id))
-//      Future.successful(Ok(json))
-//    }
-//  }
-
-  def getDevice(id:String) = Action.async(parse.json) {
+  def getDevice(id:String) = Action.async {
     implicit request => {
       //Maybe find a device with the specified id
-      val deviceCollection = DeviceCollection.getDeviceCollection()
+      val deviceCollection = DeviceCollection.getDeviceCollection
       val device:Option[Device] = deviceCollection.devices.find(device => device.id == id)
 
       //When a device is found, check its type, populate the transient data and return it.
@@ -98,4 +80,14 @@ class K8055Controller extends Controller {
       }
     )
   }
+
+  def deleteDevices() = Action.async {
+    Future.successful(Ok(""))
+  }
+
+  def deleteDevice(id:String) = Action.async {
+    DeviceCollection.deleteDevice(id)
+    Future.successful(Ok(""))
+  }
+
 }

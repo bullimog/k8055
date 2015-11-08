@@ -25,9 +25,9 @@ object ConfigIO {
     }
   }
 
-  def writeDeviceCollectionToFile(fileName: String, componentCollection: DeviceCollection):Unit = {
+  def writeDeviceCollectionToFile(fileName: String, deviceCollection: DeviceCollection):Unit = {
     val writer = new PrintWriter(new File(fileName))
-    writer.write(Json.prettyPrint(Json.toJson(componentCollection)))
+    writer.write(Json.prettyPrint(Json.toJson(deviceCollection)))
     writer.close()
   }
 }

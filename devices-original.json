@@ -1,0 +1,37 @@
+{
+  "name" : "Masher 1",
+  "description" : "My first set-up, for mashing",
+  "devices" : [ {
+    "id" : "AI-1",
+    "description" : "Thermometer",
+    "deviceType" : 1,
+    "channel" : 1, 
+    "units" : "°c",
+    "conversionFactor" : 0.392156862,
+    "conversionOffset" : 0,
+    "decimalPlaces" : 1
+  }, {
+    "id" : "DO-1",
+    "description" : "Pump",
+    "deviceType" : 4,
+    "channel" : 1
+  }, {
+    "id" : "AO-1",
+    "description" : "Heater",
+    "deviceType" : 2,
+    "channel" : 1,
+    "units" : "%"
+  }, {
+    "id" : "TI-1",
+    "description" : "Clock",
+    "deviceType" : 0,
+    "channel" : 0
+  }, {
+    "id" : "MO-1",
+    "description" : "Thermostat",
+    "deviceType" : 5,
+    "channel" : 0,
+    "monitorSensor" : "AI-1",
+    "monitorIncreaser" : "AO-1"
+  } ]
+}
