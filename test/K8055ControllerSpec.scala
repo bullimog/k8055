@@ -10,6 +10,8 @@ import play.api.test.Helpers._
 @RunWith(classOf[JUnitRunner])
 class K8055ControllerSpec extends Specification {
 
+  //TODO: Need some tests, for IO failures
+
   "Application" should {
 
     "send 404 on a bad request" in new WithApplication{
@@ -23,6 +25,8 @@ class K8055ControllerSpec extends Specification {
       contentType(home) must beSome.which(_ == "application/json")
       //contentAsString(home) must contain ("pump")
     }
+
+
 
     val pump = Device("TEST-DO-1", "test-pump", DIGITAL_OUT, 1, digitalState = Some(false))
     val heater = Device("TEST-AO-1", "test-heater", ANALOGUE_OUT, 1, Some("%"), Some(0), analogueState = Some(0))

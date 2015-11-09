@@ -33,8 +33,8 @@ class K8055Controller extends Controller {
     }
   }
 
-  def returnPopulatedDevice(device: Device, fn: Device => Device):Future[Result] = {
-    val json = Json.toJson(fn(device))
+  def returnPopulatedDevice(device: Device, populateFn: Device => Device):Future[Result] = {
+    val json = Json.toJson(populateFn(device))
     Future.successful(Ok(json))
   }
 
@@ -42,8 +42,10 @@ class K8055Controller extends Controller {
     implicit request => request.body.validate[Device].fold(
       errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       device => {
-        DeviceCollection.upsertDevice(device)
-        Future.successful(Ok(Json.obj("message" -> ("Device '"+device.description+"' saved.") )))
+        if (DeviceCollection.upsertDevice(device)) {
+          Future.successful(Ok(Json.obj("message" -> ("Device '"+device.description+"' saved.") )))
+        }
+        else Future.successful(BadRequest(Json.obj("message" -> s"Could not add device $device")))
       }
     )
   }

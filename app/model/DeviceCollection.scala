@@ -1,6 +1,7 @@
 package model
 
-import connectors.ConfigIO
+import connectors.{Configuration, DeviceConfigIO}
+import play.api.Play
 import play.api.libs.json.{Json, JsPath, Reads}
 import play.api.libs.functional.syntax._
 
@@ -17,7 +18,7 @@ object DeviceCollection{
   implicit val deviceCollectionWrites = Json.writes[DeviceCollection]
 
   def getDeviceCollection:DeviceCollection = {
-    val oDeviceCollection: Option[DeviceCollection] = ConfigIO.readDeviceCollectionFromFile("devices.json")
+    val oDeviceCollection: Option[DeviceCollection] = DeviceConfigIO.readDeviceCollectionFromFile(Configuration.filename)
     oDeviceCollection.fold(DeviceCollection("NoneRead", "Empty", List()))({
       deviceCollection => deviceCollection
     })
@@ -53,7 +54,7 @@ object DeviceCollection{
   }
 
   def putDeviceCollection(deviceCollection: DeviceCollection):Boolean = {
-    ConfigIO.writeDeviceCollectionToFile("devices.json", deviceCollection)
+    DeviceConfigIO.writeDeviceCollectionToFile(Configuration.filename, deviceCollection)
   }
 
 }

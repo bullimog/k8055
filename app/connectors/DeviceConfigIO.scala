@@ -6,7 +6,7 @@ import play.api.libs.json.{Json, JsError, JsSuccess, JsValue}
 import scala.io.Source
 
 
-object ConfigIO {
+object DeviceConfigIO {
 
   def parseDeviceCollection(json: JsValue):Option[DeviceCollection] = {
     json.validate[DeviceCollection] match {
