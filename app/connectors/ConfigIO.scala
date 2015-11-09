@@ -25,9 +25,16 @@ object ConfigIO {
     }
   }
 
-  def writeDeviceCollectionToFile(fileName: String, deviceCollection: DeviceCollection):Unit = {
-    val writer = new PrintWriter(new File(fileName))
-    writer.write(Json.prettyPrint(Json.toJson(deviceCollection)))
-    writer.close()
+  def writeDeviceCollectionToFile(fileName: String, deviceCollection: DeviceCollection):Boolean = {
+    try{
+      val writer = new PrintWriter(new File(fileName))
+      writer.write(Json.prettyPrint(Json.toJson(deviceCollection)))
+      writer.close()
+      true
+    }
+    catch{
+      case e: Exception => println("Could not write to file: "+e); false
+    }
   }
+
 }

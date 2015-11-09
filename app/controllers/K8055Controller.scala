@@ -42,29 +42,19 @@ class K8055Controller extends Controller {
     implicit request => request.body.validate[Device].fold(
       errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       device => {
-        DeviceCollection.addDevice(device)
+        DeviceCollection.upsertDevice(device)
         Future.successful(Ok(Json.obj("message" -> ("Device '"+device.description+"' saved.") )))
       }
     )
   }
 
-  def updateDevice() = Action.async(parse.json) {
-    implicit request => request.body.validate[Device].fold(
-      errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
-      device => {
-        DeviceCollection.addDevice(device)
-        Future.successful(Ok(Json.obj("message" -> ("Device '"+device.description+"' saved.") )))
-      }
-    )
-  }
+  def updateDevice() = addDevice()
 
-  def deleteDevices() = Action.async {
-    Future.successful(Ok(""))
-  }
 
   def deleteDevice(id:String) = Action.async {
-    DeviceCollection.deleteDevice(id)
-    Future.successful(Ok(""))
+    if (DeviceCollection.deleteDevice(id))
+      Future.successful(Ok(Json.obj("message" -> s"Deleted device $id")))
+    else
+      Future.successful(BadRequest(Json.obj("message" -> s"Could not delete device $id")))
   }
-
 }

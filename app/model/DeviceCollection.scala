@@ -23,7 +23,7 @@ object DeviceCollection{
     })
   }
 
-  def addDevice(device: Device) = {
+  def upsertDevice(device: Device):Boolean = {
     val deviceCollection = getDeviceCollection
     val devices:List[Device] = deviceCollection.devices
     val deviceRemoved = devices.filter(d => d.id != device.id)
@@ -32,8 +32,19 @@ object DeviceCollection{
     putDeviceCollection(dc)
   }
 
-  def deleteDevice(device: Device):Unit = {deleteDevice(device.id)}
-  def deleteDevice(device: String):Unit = {
+//  def addDevice(device: Device):Boolean = {
+//    val deviceCollection = getDeviceCollection
+//    val devices:List[Device] = deviceCollection.devices
+//    if(devices.exists(d => d.id == device.id)) false
+//    else {
+//      val deviceAdded = devices ::: List(device)
+//      val dc = deviceCollection.copy(devices = deviceAdded)
+//      putDeviceCollection(dc)
+//    }
+//  }
+
+  def deleteDevice(device: Device):Boolean = {deleteDevice(device.id)}
+  def deleteDevice(device: String):Boolean = {
     val deviceCollection = getDeviceCollection
     val devices:List[Device] = deviceCollection.devices
     val deviceRemoved = devices.filter(d => d.id != device)
@@ -41,7 +52,7 @@ object DeviceCollection{
     putDeviceCollection(dc)
   }
 
-  def putDeviceCollection(deviceCollection: DeviceCollection):Unit = {
+  def putDeviceCollection(deviceCollection: DeviceCollection):Boolean = {
     ConfigIO.writeDeviceCollectionToFile("devices.json", deviceCollection)
   }
 
