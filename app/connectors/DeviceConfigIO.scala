@@ -2,6 +2,7 @@ package connectors
 
 import java.io.{File, PrintWriter, FileNotFoundException}
 import model.DeviceCollection
+import play.Logger
 import play.api.libs.json.{Json, JsError, JsSuccess, JsValue}
 import scala.io.Source
 
@@ -33,7 +34,7 @@ object DeviceConfigIO {
       true
     }
     catch{
-      case e: Exception => println("Could not write to file: "+e); false
+      case e: Exception => Logger.error("Could not write to file: "+e); false
     }
   }
 
