@@ -1,3 +1,4 @@
+import connectors.Configuration
 import model.{Device, DeviceCollection}
 import model.Device._
 import org.specs2.mutable._
@@ -38,62 +39,72 @@ class K8055ControllerSpec extends Specification {
     val updatedSwitch = switch.copy(description = "changed-switch")
     val updatedThermometer = thermometer.copy(description = "changed-thermometer")
 
-    "check a Digital Out device is not present" in new WithApplication {testDeviceGet(pump, false)}
+    val shouldBeFound = true
+    val shouldNotBeFound = false
+
+    "test that we're unable to fetch a device, when there's bad config..." in {
+      running(FakeApplication(additionalConfiguration = Map("file.name"->"no_devices.json"))){
+        //println("############# = "+Configuration.filename)
+        testDeviceGet(pump, shouldNotBeFound)
+      }
+    }
+
+    "check a Digital Out device is not present" in new WithApplication {testDeviceGet(pump, shouldNotBeFound)}
     "add a Digital Out device" in new WithApplication {testDeviceAdd(pump)}
-    "check a Digital Out device is present" in new WithApplication {testDeviceGet(pump, true)}
+    "check a Digital Out device is present" in new WithApplication {testDeviceGet(pump, shouldBeFound)}
 
-    "check a Analogue Out device is not present" in new WithApplication {testDeviceGet(heater, false)}
+    "check a Analogue Out device is not present" in new WithApplication {testDeviceGet(heater, shouldNotBeFound)}
     "add an Analogue Out device" in new WithApplication {testDeviceAdd(heater)}
-    "check a Analogue Out device is present" in new WithApplication {testDeviceGet(heater, true)}
+    "check a Analogue Out device is present" in new WithApplication {testDeviceGet(heater, shouldBeFound)}
 
-    "check a Digital In device is not present" in new WithApplication {testDeviceGet(switch, false)}
+    "check a Digital In device is not present" in new WithApplication {testDeviceGet(switch, shouldNotBeFound)}
     "add a Digital In device" in new WithApplication {testDeviceAdd(switch)}
-    "check a Digital In device is present" in new WithApplication {testDeviceGet(switch, true)}
+    "check a Digital In device is present" in new WithApplication {testDeviceGet(switch, shouldBeFound)}
 
-    "check a Analogue In device is not present" in new WithApplication {testDeviceGet(thermometer, false)}
+    "check a Analogue In device is not present" in new WithApplication {testDeviceGet(thermometer, shouldNotBeFound)}
     "add an Analogue In device" in new WithApplication {testDeviceAdd(thermometer)}
-    "check a Analogue In device is present" in new WithApplication {testDeviceGet(thermometer, true)}
+    "check a Analogue In device is present" in new WithApplication {testDeviceGet(thermometer, shouldBeFound)}
 
-    "check a Original Digital Out device is present" in new WithApplication {testDeviceGetIsSame(pump, true)}
-    "check a New Digital Out device is not present" in new WithApplication {testDeviceGetIsSame(updatedPump, false)}
+    "check a Original Digital Out device is present" in new WithApplication {testDeviceGetIsSame(pump, shouldBeFound)}
+    "check a New Digital Out device is not present" in new WithApplication {testDeviceGetIsSame(updatedPump, shouldNotBeFound)}
     "update a Digital Out device" in new WithApplication {testDeviceUpdate(pump, updatedPump)}
-    "check a Original Digital Out device is not present" in new WithApplication {testDeviceGetIsSame(pump, false)}
-    "check a New Digital Out device is present" in new WithApplication {testDeviceGetIsSame(updatedPump, true)}
+    "check a Original Digital Out device is not present" in new WithApplication {testDeviceGetIsSame(pump, shouldNotBeFound)}
+    "check a New Digital Out device is present" in new WithApplication {testDeviceGetIsSame(updatedPump, shouldBeFound)}
 
-    "check a Original Analogue Out device is present" in new WithApplication {testDeviceGetIsSame(heater, true)}
-    "check a New Analogue Out device is not present" in new WithApplication {testDeviceGetIsSame(updatedHeater, false)}
+    "check a Original Analogue Out device is present" in new WithApplication {testDeviceGetIsSame(heater, shouldBeFound)}
+    "check a New Analogue Out device is not present" in new WithApplication {testDeviceGetIsSame(updatedHeater, shouldNotBeFound)}
     "update an Analogue Out device" in new WithApplication {testDeviceUpdate(heater, updatedHeater)}
-    "check a Original Analogue Out device is not present" in new WithApplication {testDeviceGetIsSame(heater, false)}
-    "check a New Analogue Out device is present" in new WithApplication {testDeviceGetIsSame(updatedHeater, true)}
+    "check a Original Analogue Out device is not present" in new WithApplication {testDeviceGetIsSame(heater, shouldNotBeFound)}
+    "check a New Analogue Out device is present" in new WithApplication {testDeviceGetIsSame(updatedHeater, shouldBeFound)}
 
-    "check a Original Digital In device is present" in new WithApplication {testDeviceGetIsSame(switch, true)}
-    "check a New Digital In device is not present" in new WithApplication {testDeviceGetIsSame(updatedSwitch, false)}
+    "check a Original Digital In device is present" in new WithApplication {testDeviceGetIsSame(switch, shouldBeFound)}
+    "check a New Digital In device is not present" in new WithApplication {testDeviceGetIsSame(updatedSwitch, shouldNotBeFound)}
     "update a Digital In device" in new WithApplication {testDeviceUpdate(switch, updatedSwitch)}
-    "check a Original Digital In device is not present" in new WithApplication {testDeviceGetIsSame(switch, false)}
-    "check a New Digital In device is present" in new WithApplication {testDeviceGetIsSame(updatedSwitch, true)}
+    "check a Original Digital In device is not present" in new WithApplication {testDeviceGetIsSame(switch, shouldNotBeFound)}
+    "check a New Digital In device is present" in new WithApplication {testDeviceGetIsSame(updatedSwitch, shouldBeFound)}
 
-    "check a Original Analogue In device is present" in new WithApplication {testDeviceGetIsSame(thermometer, true)}
-    "check a New Analogue In device is present" in new WithApplication {testDeviceGetIsSame(updatedThermometer, false)}
+    "check a Original Analogue In device is present" in new WithApplication {testDeviceGetIsSame(thermometer, shouldBeFound)}
+    "check a New Analogue In device is present" in new WithApplication {testDeviceGetIsSame(updatedThermometer, shouldNotBeFound)}
     "update an Analogue In device" in new WithApplication {testDeviceUpdate(thermometer, updatedThermometer)}
-    "check a Original Analogue In device is not present" in new WithApplication {testDeviceGetIsSame(thermometer, false)}
-    "check a New Analogue In device is present" in new WithApplication {testDeviceGetIsSame(updatedThermometer, true)}
+    "check a Original Analogue In device is not present" in new WithApplication {testDeviceGetIsSame(thermometer, shouldNotBeFound)}
+    "check a New Analogue In device is present" in new WithApplication {testDeviceGetIsSame(updatedThermometer, shouldBeFound)}
 
 
-    "check a Digital Out device is present" in new WithApplication {testDeviceGet(updatedPump, true)}
+    "check a Digital Out device is present" in new WithApplication {testDeviceGet(updatedPump, shouldBeFound)}
     "delete a Digital Out device" in new WithApplication {testDeviceDelete(pump)}
-    "check a Digital Out device is not present" in new WithApplication {testDeviceGet(pump, false)}
+    "check a Digital Out device is not present" in new WithApplication {testDeviceGet(pump, shouldNotBeFound)}
 
-    "check a Analogue Out device is present" in new WithApplication {testDeviceGet(updatedHeater, true)}
+    "check a Analogue Out device is present" in new WithApplication {testDeviceGet(updatedHeater, shouldBeFound)}
     "delete an Analogue Out device" in new WithApplication {testDeviceDelete(heater)}
-    "check a Analogue Out device is not present" in new WithApplication {testDeviceGet(heater, false)}
+    "check a Analogue Out device is not present" in new WithApplication {testDeviceGet(heater, shouldNotBeFound)}
 
-    "check a Digital In device is present" in new WithApplication {testDeviceGet(updatedSwitch, true)}
+    "check a Digital In device is present" in new WithApplication {testDeviceGet(updatedSwitch, shouldBeFound)}
     "delete a Digital In device" in new WithApplication {testDeviceDelete(switch)}
-    "check a Digital In device is not present" in new WithApplication {testDeviceGet(switch, false)}
+    "check a Digital In device is not present" in new WithApplication {testDeviceGet(switch, shouldNotBeFound)}
 
-    "check a Analogue In device is present" in new WithApplication {testDeviceGet(updatedThermometer, true)}
+    "check a Analogue In device is present" in new WithApplication {testDeviceGet(updatedThermometer, shouldBeFound)}
     "delete a Analogue In device" in new WithApplication {testDeviceDelete(thermometer)}
-    "check a Analogue In device is not present" in new WithApplication {testDeviceGet(thermometer, false)}
+    "check a Analogue In device is not present" in new WithApplication {testDeviceGet(thermometer, shouldNotBeFound)}
   }
 
 
@@ -125,6 +136,7 @@ class K8055ControllerSpec extends Specification {
   def testDeviceGet(device: Device, shouldBeThere:Boolean) = {
     //Test the the device is actually in there
     val home = route(FakeRequest(GET, "/device/"+device.id)).get
+
     if(shouldBeThere){
       status(home) must equalTo(OK)
 
