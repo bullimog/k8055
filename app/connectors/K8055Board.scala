@@ -167,7 +167,7 @@ trait K8055Board{
     executeCommand(s"k8055 -d:0 -a1:0 -a2:0 -reset1 -reset2")
   }
 
-  def setStatus():String = {
+  private def setStatus():String = {
     val byteVal1:Int = analogueOut1/byteToStoreFactor
     val byteVal2:Int = analogueOut2/byteToStoreFactor
     executeCommand(s"k8055 -d:$digitalOut -a1:$byteVal1 -a2:$byteVal2")

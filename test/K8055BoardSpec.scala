@@ -147,6 +147,8 @@ class K8055BoardSpec extends Specification {
       k8055Board.getCount(1) must equalTo(0)
       k8055Board.getDigitalInLatch(1) must equalTo(false)
 
+      k8055Board.resetStatus()
+      k8055Board.lastCommand must equalTo("k8055 -d:0 -a1:0 -a2:0 -reset1 -reset2")
 
 
     }
