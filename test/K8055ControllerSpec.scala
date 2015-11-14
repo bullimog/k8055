@@ -1,6 +1,6 @@
 import connectors.Configuration
-import model.{Device, DeviceCollection}
-import model.Device._
+import model.RawDevice
+import model.RawDevice._
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
@@ -29,10 +29,11 @@ class K8055ControllerSpec extends Specification {
 
 
 
-    val pump = Device("TEST-DO-1", "test-pump", DIGITAL_OUT, 1, digitalState = Some(false))
-    val heater = Device("TEST-AO-1", "test-heater", ANALOGUE_OUT, 1, Some("%"), Some(0), analogueState = Some(0))
-    val switch = Device("TEST-DI-1", "test-switch", DIGITAL_IN, 1, digitalState = Some(false))
-    val thermometer = Device("TEST-AI-1", "test-thermometer", ANALOGUE_IN, 1, Some("%"), Some(0), analogueState = Some(0))
+    val pump = RawDevice("TEST-DO-1", "test-pump", DIGITAL_OUT, 1, digitalState = Some(false))
+    val heater = RawDevice("TEST-AO-1", "test-heater", ANALOGUE_OUT, 1, Some("%"), Some(0), analogueState = Some(0))
+    val switch = RawDevice("TEST-DI-1", "test-switch", DIGITAL_IN, 1, digitalState = Some(false))
+    val thermometer = RawDevice("TEST-AI-1", "test-thermometer", ANALOGUE_IN, 1, Some("%"), Some(0), analogueState = Some(0))
+    val thermostat = RawDevice("MO-1", "Thermostat", MONITOR, 1, Some("c"), None, None, None, Some("TEST-AI-1"), Some("TEST-AO-1"), None, Some(false), Some(0) )
 
     val updatedPump = pump.copy(description = "changed-pump")
     val updatedHeater = heater.copy(description = "changed-heater")
@@ -108,7 +109,7 @@ class K8055ControllerSpec extends Specification {
   }
 
 
-  def testDeviceAdd(device:Device) = {
+  def testDeviceAdd(device:RawDevice) = {
     val jDevice = Json.toJson(device)
 
     //Test that the POST is successful
@@ -118,7 +119,7 @@ class K8055ControllerSpec extends Specification {
     status(result) must equalTo(OK)
   }
 
-  def testDeviceUpdate(originalDevice: Device, updatedDevice: Device) = {
+  def testDeviceUpdate(originalDevice: RawDevice, updatedDevice: RawDevice) = {
     val jDevice = Json.toJson(updatedDevice)
     val req = FakeRequest(method = "PUT", uri = controllers.routes.K8055Controller.updateDevice().url,
       headers = FakeHeaders(Seq("Content-type"->"application/json")), body =  jDevice)
@@ -126,14 +127,14 @@ class K8055ControllerSpec extends Specification {
     status(result) must equalTo(OK)
   }
 
-  def testDeviceDelete(device:Device) = {
+  def testDeviceDelete(device:RawDevice) = {
     val jDevice = Json.toJson(device)
     //Test that the POST is successful
     val req = route(FakeRequest(DELETE, "/device/"+device.id)).get
     status(req) must equalTo(OK)
   }
 
-  def testDeviceGet(device: Device, shouldBeThere:Boolean) = {
+  def testDeviceGet(device: RawDevice, shouldBeThere:Boolean) = {
     //Test the the device is actually in there
     val home = route(FakeRequest(GET, "/device/"+device.id)).get
 
@@ -142,9 +143,9 @@ class K8055ControllerSpec extends Specification {
 
       contentType(home) must beSome.which(_ == "application/json")
       val json: JsValue = Json.parse(contentAsString(home))
-      val d:Device = json.validate[Device] match {
-        case s: JsSuccess[Device] => s.get
-        case e: JsError => println("jsError: "+e ); Device("None", "Empty",0,0)
+      val d:RawDevice = json.validate[RawDevice] match {
+        case s: JsSuccess[RawDevice] => s.get
+        case e: JsError => println("jsError: "+e ); RawDevice("None", "Empty",0,0)
       }
       d must equalTo(device)
     }
@@ -153,7 +154,7 @@ class K8055ControllerSpec extends Specification {
     }
   }
 
-  def testDeviceGetIsSame(device: Device, shouldBeSame:Boolean) = {
+  def testDeviceGetIsSame(device: RawDevice, shouldBeSame:Boolean) = {
     //Test the the device is actually in there
     val home = route(FakeRequest(GET, "/device/"+device.id)).get
     status(home) must equalTo(OK)
@@ -161,9 +162,9 @@ class K8055ControllerSpec extends Specification {
 
     contentType(home) must beSome.which(_ == "application/json")
     val json: JsValue = Json.parse(contentAsString(home))
-    val d:Device = json.validate[Device] match {
-      case s: JsSuccess[Device] => s.get
-      case e: JsError => println("jsError: "+e ); Device("None", "Empty",0,0)
+    val d:RawDevice = json.validate[RawDevice] match {
+      case s: JsSuccess[RawDevice] => s.get
+      case e: JsError => println("jsError: "+e ); RawDevice("None", "Empty",0,0)
     }
 
     if(shouldBeSame) {
