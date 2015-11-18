@@ -1,6 +1,6 @@
 {
-  "name" : "Masher 1",
-  "description" : "My first set-up, for mashing",
+  "name" : "Configuration Name",
+  "description" : "Configuration Description",
   "devices" : [ {
     "id" : "AI-1",
     "description" : "Thermometer",
