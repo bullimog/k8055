@@ -56,7 +56,7 @@ object Device {
   }
 
   def populateMonitor(device: Device):Device = {
-
-    device.copy(digitalState = Some(K8055Board.getDigitalOut(device.channel)))
+    device.copy(digitalState = Some(K8055Board.getDigitalOut(device.channel)),
+      analogueState = Some(K8055Board.getAnalogueOut(device.channel)))
   }
 }
