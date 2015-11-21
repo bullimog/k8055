@@ -6,6 +6,8 @@ import play.api.mvc._
 import play.api.libs.json._
 import scala.concurrent.Future
 
+//object K8055Controller extends K8055Controller
+
 class K8055Controller extends Controller {
 
   def deviceCollection() = Action.async {

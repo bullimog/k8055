@@ -11,8 +11,6 @@ import play.api.test.Helpers._
 @RunWith(classOf[JUnitRunner])
 class K8055ControllerSpec extends Specification {
 
-  //TODO: Need some tests, for IO failures
-
   "Application" should {
 
     "send 404 on a bad request" in new WithApplication{
