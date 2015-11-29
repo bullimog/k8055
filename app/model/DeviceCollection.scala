@@ -1,5 +1,6 @@
 package model
 
+import connector.K8055Board
 import connectors.{Configuration, DeviceConfigIO}
 import model.Device._
 import play.api.Play
@@ -47,7 +48,13 @@ object DeviceCollection{
     val deviceRemoved = devices.filter(d => d.id != device.id)
     val deviceAdded = deviceRemoved ::: List(device)
     val dc = deviceCollection.copy(devices = deviceAdded)
+    updateTransientData(device)
     putDeviceCollection(dc)
+  }
+
+  def updateTransientData(device: Device) = {
+    K8055Board.setAnalogueOut(device.channel, device.analogueState.getOrElse(0))
+    K8055Board.setDigitalOut(device.channel, device.digitalState.getOrElse(false))
   }
 
 //  def addDevice(device: Device):Boolean = {
