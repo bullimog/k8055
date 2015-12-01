@@ -8,6 +8,7 @@ GET     /devices                    controllers.K8055Controller.deviceCollection
 GET     /device/:id                 controllers.K8055Controller.getDevice(id: String)
 POST    /device                     controllers.K8055Controller.addDevice
 PUT     /device                     controllers.K8055Controller.updateDevice
+PUT     /deviceState                controllers.K8055Controller.patchDevice
 DELETE  /device/:id                 controllers.K8055Controller.deleteDevice(id: String)
 
 # Map static resources from the /public folder to the /assets URL path

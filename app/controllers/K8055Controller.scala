@@ -1,6 +1,6 @@
 package controllers
 
-import model.{Device, DeviceCollection}
+import model.{DeviceState, Device, DeviceCollection}
 import model.Device._
 import play.api.mvc._
 import play.api.libs.json._
@@ -28,7 +28,7 @@ class K8055Controller extends Controller {
         d => d.deviceType match{
           case ANALOGUE_IN => returnPopulatedDevice(d, populateAnalogueIn)
           case ANALOGUE_OUT => returnPopulatedDevice(d, populateAnalogueOut)
-          case DIGITAL_IN => returnPopulatedDevice(d, populateDigitalIn)
+          case DIGITAL_IN => {returnPopulatedDevice(d, populateDigitalIn)}
           case DIGITAL_OUT => returnPopulatedDevice(d, populateDigitalOut)
           case MONITOR => returnPopulatedDevice(d, populateMonitor)
           case _ => Future.successful(BadRequest(Json.obj("result" -> "Can't read from device")))
@@ -55,6 +55,19 @@ class K8055Controller extends Controller {
   }
 
   def updateDevice() = addDevice()
+
+
+  def patchDevice() = Action.async(parse.json) {
+    implicit request => request.body.validate[DeviceState].fold(
+      errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
+      deviceState => {
+        if (DeviceCollection.patchDevice(deviceState)) {
+          Future.successful(Ok(Json.obj("message" -> ("Device '"+deviceState.id+"' patched.") )))
+        }
+        else Future.successful(BadRequest(Json.obj("message" -> s"Could not patch device $deviceState.id")))
+      }
+    )
+  }
 
 
   def deleteDevice(id:String) = Action.async {

@@ -57,6 +57,22 @@ object DeviceCollection{
     K8055Board.setDigitalOut(device.channel, device.digitalState.getOrElse(false))
   }
 
+  def patchDevice(deviceState: DeviceState):Boolean = {
+    val deviceCollection = getDeviceCollection
+    val devices:List[Device] = deviceCollection.devices
+    devices.find(d => d.id == deviceState.id).exists(device =>
+      device.deviceType match {
+        case Device.ANALOGUE_OUT =>
+          updateTransientData(device.copy(analogueState = deviceState.analogueState))
+          true
+        case Device.DIGITAL_OUT =>
+          updateTransientData(device.copy(digitalState = deviceState.digitalState))
+          true
+        case _ => false
+      }
+    )
+  }
+
 //  def addDevice(device: Device):Boolean = {
 //    val deviceCollection = getDeviceCollection
 //    val devices:List[Device] = deviceCollection.devices

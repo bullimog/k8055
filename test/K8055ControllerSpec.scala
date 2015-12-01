@@ -1,5 +1,5 @@
 import connectors.Configuration
-import model.Device
+import model.{DeviceState, Device}
 import model.Device._
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -11,7 +11,7 @@ import play.api.test.Helpers._
 @RunWith(classOf[JUnitRunner])
 class K8055ControllerSpec extends Specification {
 
-  "Application" should {
+  "K8055 Controller" should {
 
     "send 404 on a bad request" in new WithApplication{
       route(FakeRequest(GET, "/boum")) must beSome.which (status(_) == NOT_FOUND)
@@ -48,6 +48,7 @@ class K8055ControllerSpec extends Specification {
       }
     }
 
+    // Device adds.
     "check a Digital Out device is not present" in new WithApplication {testDeviceGet(pump, shouldNotBeFound)}
     "add a Digital Out device" in new WithApplication {testDeviceAdd(pump)}
     "check a Digital Out device is present" in new WithApplication {testDeviceGet(pump, shouldBeFound)}
@@ -64,6 +65,7 @@ class K8055ControllerSpec extends Specification {
     "add an Analogue In device" in new WithApplication {testDeviceAdd(thermometer)}
     "check a Analogue In device is present" in new WithApplication {testDeviceGet(thermometer, shouldBeFound)}
 
+    //Device updates...
     "check a Original Digital Out device is present" in new WithApplication {testDeviceGetIsSame(pump, shouldBeFound)}
     "check a New Digital Out device is not present" in new WithApplication {testDeviceGetIsSame(updatedPump, shouldNotBeFound)}
     "update a Digital Out device" in new WithApplication {testDeviceUpdate(pump, updatedPump)}
@@ -83,27 +85,49 @@ class K8055ControllerSpec extends Specification {
     "check a New Digital In device is present" in new WithApplication {testDeviceGetIsSame(updatedSwitch, shouldBeFound)}
 
     "check a Original Analogue In device is present" in new WithApplication {testDeviceGetIsSame(thermometer, shouldBeFound)}
-    "check a New Analogue In device is present" in new WithApplication {testDeviceGetIsSame(updatedThermometer, shouldNotBeFound)}
+    "check a New Analogue In device is not present" in new WithApplication {testDeviceGetIsSame(updatedThermometer, shouldNotBeFound)}
     "update an Analogue In device" in new WithApplication {testDeviceUpdate(thermometer, updatedThermometer)}
     "check a Original Analogue In device is not present" in new WithApplication {testDeviceGetIsSame(thermometer, shouldNotBeFound)}
     "check a New Analogue In device is present" in new WithApplication {testDeviceGetIsSame(updatedThermometer, shouldBeFound)}
 
+    //Device patches...
+    "check a Original Digital Out device is present" in new WithApplication {testDeviceGetIsSame(updatedPump, shouldBeFound)}
+    "patch a Digital Out device" in new WithApplication {testDigitalDevicePatch(updatedPump, true, true)}
+    "check a New Digital Out device is present" in new WithApplication {
+      testDeviceGetIsSame(updatedPump.copy(digitalState=Some(true)), shouldBeFound)
+    }
+    "un-patch a Digital Out device" in new WithApplication {testDigitalDevicePatch(updatedPump, false, true)}
 
+    "check a Original Analogue Out device is present" in new WithApplication {testDeviceGetIsSame(updatedHeater, shouldBeFound)}
+    "patch an Analogue Out device" in new WithApplication {testAnalogueDevicePatch(updatedHeater, 44, true)}
+    "check a New Analogue Out device is present" in new WithApplication {
+      testDeviceGetIsSame(updatedHeater.copy(analogueState=Some(44)), shouldBeFound)
+    }
+    "un-patch an Analogue Out device" in new WithApplication {testAnalogueDevicePatch(updatedHeater, 0, true)}
+
+    "check an Original Digital In device is present" in new WithApplication {testDeviceGetIsSame(updatedSwitch, shouldBeFound)}
+    "ensure we can't patch a Digital In device" in new WithApplication {testDigitalDeviceInPatch(updatedSwitch, true, false)}
+
+    "check a Original Analogue In device is present" in new WithApplication {testDeviceGetIsSame(updatedThermometer, shouldBeFound)}
+    "ensure we can't patch an Analogue In device" in new WithApplication {testAnalogueInDevicePatch(updatedThermometer, 44, false)}
+
+
+    //Device deletes...
     "check a Digital Out device is present" in new WithApplication {testDeviceGet(updatedPump, shouldBeFound)}
     "delete a Digital Out device" in new WithApplication {testDeviceDelete(pump)}
     "check a Digital Out device is not present" in new WithApplication {testDeviceGet(pump, shouldNotBeFound)}
 
-    "check a Analogue Out device is present" in new WithApplication {testDeviceGet(updatedHeater, shouldBeFound)}
+    "check an Analogue Out device is present" in new WithApplication {testDeviceGet(updatedHeater, shouldBeFound)}
     "delete an Analogue Out device" in new WithApplication {testDeviceDelete(heater)}
-    "check a Analogue Out device is not present" in new WithApplication {testDeviceGet(heater, shouldNotBeFound)}
+    "check an Analogue Out device is not present" in new WithApplication {testDeviceGet(heater, shouldNotBeFound)}
 
     "check a Digital In device is present" in new WithApplication {testDeviceGet(updatedSwitch, shouldBeFound)}
     "delete a Digital In device" in new WithApplication {testDeviceDelete(switch)}
     "check a Digital In device is not present" in new WithApplication {testDeviceGet(switch, shouldNotBeFound)}
 
-    "check a Analogue In device is present" in new WithApplication {testDeviceGet(updatedThermometer, shouldBeFound)}
-    "delete a Analogue In device" in new WithApplication {testDeviceDelete(thermometer)}
-    "check a Analogue In device is not present" in new WithApplication {testDeviceGet(thermometer, shouldNotBeFound)}
+    "check an Analogue In device is present" in new WithApplication {testDeviceGet(updatedThermometer, shouldBeFound)}
+    "delete an Analogue In device" in new WithApplication {testDeviceDelete(thermometer)}
+    "check an Analogue In device is not present" in new WithApplication {testDeviceGet(thermometer, shouldNotBeFound)}
   }
 
 
@@ -123,6 +147,56 @@ class K8055ControllerSpec extends Specification {
       headers = FakeHeaders(Seq("Content-type"->"application/json")), body =  jDevice)
     val Some(result) = route(req)
     status(result) must equalTo(OK)
+  }
+
+  def testDigitalDevicePatch(originalDevice: Device, state:Boolean, shouldSucceed:Boolean) = {
+    val deviceState=DeviceState("TEST-DO-1", digitalState = Some(state))
+    val jDeviceState = Json.toJson(deviceState)
+    val req = FakeRequest(method = "PUT", uri = controllers.routes.K8055Controller.patchDevice().url,
+      headers = FakeHeaders(Seq("Content-type"->"application/json")), body =  jDeviceState)
+    val Some(result) = route(req)
+    if(shouldSucceed)
+      status(result) must equalTo(OK)
+    else
+      status(result) must equalTo(BAD_REQUEST)
+  }
+
+  def testDigitalDeviceInPatch(originalDevice: Device, state:Boolean, shouldSucceed:Boolean) = {
+    val deviceState=DeviceState("TEST-DI-1", digitalState = Some(state))
+    val jDeviceState = Json.toJson(deviceState)
+    val req = FakeRequest(method = "PUT", uri = controllers.routes.K8055Controller.patchDevice().url,
+      headers = FakeHeaders(Seq("Content-type"->"application/json")), body =  jDeviceState)
+    val Some(result) = route(req)
+    if(shouldSucceed)
+      status(result) must equalTo(OK)
+    else
+      status(result) must equalTo(BAD_REQUEST)
+  }
+
+
+
+  def testAnalogueDevicePatch(originalDevice: Device, state:Int, shouldSucceed:Boolean) = {
+    val deviceState=DeviceState("TEST-AO-1", analogueState = Some(state))
+    val jDeviceState = Json.toJson(deviceState)
+    val req = FakeRequest(method = "PUT", uri = controllers.routes.K8055Controller.patchDevice().url,
+      headers = FakeHeaders(Seq("Content-type"->"application/json")), body =  jDeviceState)
+    val Some(result) = route(req)
+    if(shouldSucceed)
+      status(result) must equalTo(OK)
+    else
+      status(result) must equalTo(BAD_REQUEST)
+  }
+
+  def testAnalogueInDevicePatch(originalDevice: Device, state:Int, shouldSucceed:Boolean) = {
+    val deviceState=DeviceState("TEST-AI-1", analogueState = Some(state))
+    val jDeviceState = Json.toJson(deviceState)
+    val req = FakeRequest(method = "PUT", uri = controllers.routes.K8055Controller.patchDevice().url,
+      headers = FakeHeaders(Seq("Content-type"->"application/json")), body =  jDeviceState)
+    val Some(result) = route(req)
+    if(shouldSucceed)
+      status(result) must equalTo(OK)
+    else
+      status(result) must equalTo(BAD_REQUEST)
   }
 
   def testDeviceDelete(device:Device) = {
@@ -156,7 +230,6 @@ class K8055ControllerSpec extends Specification {
     //Test the the device is actually in there
     val home = route(FakeRequest(GET, "/device/"+device.id)).get
     status(home) must equalTo(OK)
-
 
     contentType(home) must beSome.which(_ == "application/json")
     val json: JsValue = Json.parse(contentAsString(home))
