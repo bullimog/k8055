@@ -48,25 +48,31 @@ object DeviceCollection{
     val deviceRemoved = devices.filter(d => d.id != device.id)
     val deviceAdded = deviceRemoved ::: List(device)
     val dc = deviceCollection.copy(devices = deviceAdded)
-    updateTransientData(device)
+    
+    updateTransientOutData(device)
     putDeviceCollection(dc)
   }
 
-  def updateTransientData(device: Device) = {
-    K8055Board.setAnalogueOut(device.channel, device.analogueState.getOrElse(0))
-    K8055Board.setDigitalOut(device.channel, device.digitalState.getOrElse(false))
+  def updateTransientOutData(device: Device) = {
+    if(device.deviceType == Device.ANALOGUE_OUT)
+      K8055Board.setAnalogueOut(device.channel, device.analogueState.getOrElse(0))
+
+    if (device.deviceType == Device.DIGITAL_OUT)
+      K8055Board.setDigitalOut(device.channel, device.digitalState.getOrElse(false))
   }
 
-  def patchDevice(deviceState: DeviceState):Boolean = {
+  def patchDevice(deviceState: DeviceState, delta:Boolean):Boolean = {
     val deviceCollection = getDeviceCollection
     val devices:List[Device] = deviceCollection.devices
     devices.find(d => d.id == deviceState.id).exists(device =>
       device.deviceType match {
         case Device.ANALOGUE_OUT =>
-          updateTransientData(device.copy(analogueState = deviceState.analogueState))
+          val aState = if(delta) Some(device.analogueState.getOrElse(0) + deviceState.analogueState.getOrElse(0))
+                       else deviceState.analogueState
+          updateTransientOutData(device.copy(analogueState = aState))
           true
         case Device.DIGITAL_OUT =>
-          updateTransientData(device.copy(digitalState = deviceState.digitalState))
+          updateTransientOutData(device.copy(digitalState = deviceState.digitalState))
           true
         case _ => false
       }

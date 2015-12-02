@@ -61,7 +61,19 @@ class K8055Controller extends Controller {
     implicit request => request.body.validate[DeviceState].fold(
       errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       deviceState => {
-        if (DeviceCollection.patchDevice(deviceState)) {
+        if (DeviceCollection.patchDevice(deviceState, delta = false)) {
+          Future.successful(Ok(Json.obj("message" -> ("Device '"+deviceState.id+"' patched.") )))
+        }
+        else Future.successful(BadRequest(Json.obj("message" -> s"Could not patch device $deviceState.id")))
+      }
+    )
+  }
+
+  def patchDeviceDelta() = Action.async(parse.json) {
+    implicit request => request.body.validate[DeviceState].fold(
+      errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
+      deviceState => {
+        if (DeviceCollection.patchDevice(deviceState, delta = true)) {
           Future.successful(Ok(Json.obj("message" -> ("Device '"+deviceState.id+"' patched.") )))
         }
         else Future.successful(BadRequest(Json.obj("message" -> s"Could not patch device $deviceState.id")))
