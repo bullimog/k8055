@@ -36,6 +36,7 @@ trait K8055Board{
   def getAnaloguePercentageOut(channel:Int): Int ={getAnAnalogueOut(channel, percentToStoreFactor)}
   def getAnalogueOut(channel:Int): Int ={getAnAnalogueOut(channel, byteToStoreFactor)}
   def getAnAnalogueOut(channel:Int, factor: Double): Int ={
+
     channel match {
       case 1 => (analogueOut1 / factor).toInt
       case 2 => (analogueOut2 / factor).toInt
@@ -51,6 +52,7 @@ trait K8055Board{
       case 2 => analogueOut2 = (value * factor).toInt
       case _ =>
     }
+
     setStatus()
   }
 
@@ -71,6 +73,7 @@ trait K8055Board{
     * Digital Out
     **********************************************************/
   def getDigitalOut(channel:Int): Boolean ={
+//    println(s"######## getDigitalOut - $digitalOut")
     if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT){
       (digitalOut & byteMask(channel)) > 0
     }
@@ -93,6 +96,7 @@ trait K8055Board{
   def setDigitalChannel(channel:Int):Unit = {
     if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT) {
       digitalOut = (digitalOut | byteMask(channel)).toByte
+      println(s"######## setDigitalChannel - $digitalOut")
       setStatus()
     }
   }

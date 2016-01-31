@@ -124,7 +124,7 @@ class K8055ControllerSpec extends Specification {
     "51.check a New Analogue Out device is present" in new WithApplication {
       testDeviceGetIsSame(updatedHeater.copy(analogueState=Some(66)), shouldBeFound)
     }
-    "52.un-patch an Analogue Out device" in new WithApplication {testAnalogueDevicePatch(updatedHeater, 22, true)}
+    "52.un-patch an Analogue Out device" in new WithApplication {testAnalogueDeviceDeltaPatch(updatedHeater, -44, true)}
 
     //Device deletes...
     "53.check a Digital Out device is present" in new WithApplication {testDeviceGet(updatedPump, shouldBeFound)}

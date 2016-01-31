@@ -61,7 +61,7 @@ class K8055Controller extends Controller {
     implicit request => request.body.validate[DeviceState].fold(
       errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       deviceState => {
-        if (DeviceCollection.patchDevice(deviceState, delta = false)) {
+        if (DeviceCollection.patchDevice(deviceState, false)) {
           Future.successful(Ok(Json.obj("message" -> ("Device '"+deviceState.id+"' patched.") )))
         }
         else Future.successful(BadRequest(Json.obj("message" -> s"Could not patch device $deviceState.id")))
@@ -73,10 +73,10 @@ class K8055Controller extends Controller {
     implicit request => request.body.validate[DeviceState].fold(
       errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       deviceState => {
-        if (DeviceCollection.patchDevice(deviceState, delta = true)) {
+        if (DeviceCollection.patchDevice(deviceState, true)) {
           Future.successful(Ok(Json.obj("message" -> ("Device '"+deviceState.id+"' patched.") )))
         }
-        else Future.successful(BadRequest(Json.obj("message" -> s"Could not patch device $deviceState.id")))
+        else Future.successful(BadRequest(Json.obj("message" -> s"Could not delta patch device $deviceState.id")))
       }
     )
   }
