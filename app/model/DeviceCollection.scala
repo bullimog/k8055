@@ -106,17 +106,49 @@ object DeviceCollection{
 
     devices.find(d => d.id == deviceState.id).exists( device => {
 
-      val aState:Int =
-      if(delta)
-        K8055Board.getAnalogueOut(device.channel) + deviceState.analogueState.getOrElse(0)
-      else
-        deviceState.analogueState.getOrElse(0)
+      device.deviceType match {
+        case MONITOR => {
+          val aRawState = MonitorManager.getAnalogueOut(device.id)
+          val aState = if (delta)
+            aRawState + deviceState.analogueState.getOrElse(0)
+          else
+            deviceState.analogueState.getOrElse(0)
 
-      if(device.deviceType==DIGITAL_OUT)
-        updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
-      else
-        updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
+          updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
+        }
+        case ANALOGUE_OUT => {
+          val aRawState = K8055Board.getAnalogueOut(device.channel)
+          val aState = if (delta)
+            aRawState + deviceState.analogueState.getOrElse(0)
+          else
+            deviceState.analogueState.getOrElse(0)
+
+          updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
+        }
+        case DIGITAL_OUT => updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
+        case _ => false
+      }
     })
+  }
+
+//      val aRawState =
+//      if(device.deviceType==MONITOR)
+//        MonitorManager.getAnalogueOut(device.id)
+//      else
+//        K8055Board.getAnalogueOut(device.channel)
+//
+//
+//      val aState:Int =
+//      if(delta)
+//        aRawState + deviceState.analogueState.getOrElse(0)
+//      else
+//        deviceState.analogueState.getOrElse(0)
+//
+//      if(device.deviceType==DIGITAL_OUT)
+//        updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
+//      else
+//        updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
+//    })
 
 
 
@@ -137,7 +169,7 @@ object DeviceCollection{
 //        case _ => false
 //      }
 //    )
-  }
+//  }
 
 //  def addDevice(device: Device):Boolean = {
 //    val deviceCollection = getDeviceCollection

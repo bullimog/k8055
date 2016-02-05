@@ -1,6 +1,7 @@
 package model
 
 import connector.K8055Board
+import monitor.MonitorManager
 
 import scala.collection.mutable
 import play.api.libs.functional.syntax._
@@ -56,7 +57,7 @@ object Device {
   }
 
   def populateMonitor(device: Device):Device = {
-    device.copy(digitalState = Some(K8055Board.getDigitalOut(device.channel)),
-               analogueState = Some(K8055Board.getAnalogueOut(device.channel)))
+    device.copy(digitalState = Some(MonitorManager.getDigitalOut(device.id)),
+               analogueState = Some(MonitorManager.getAnalogueOut(device.id)))
   }
 }
