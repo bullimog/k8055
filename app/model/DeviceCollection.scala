@@ -115,6 +115,7 @@ object DeviceCollection{
             deviceState.analogueState.getOrElse(0)
 
           updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
+          updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
         }
         case ANALOGUE_OUT => {
           val aRawState = K8055Board.getAnalogueOut(device.channel)
