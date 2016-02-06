@@ -26,18 +26,18 @@ class K8055Controller extends Controller {
       //When a device is found, check its type, populate the transient data and return it.
       device.fold(Future.successful(BadRequest(Json.obj("result" -> "Can't find device")))) (
         d => d.deviceType match{
-          case ANALOGUE_IN => returnPopulatedDevice(d, populateAnalogueIn)
-          case ANALOGUE_OUT => returnPopulatedDevice(d, populateAnalogueOut)
-          case DIGITAL_IN => {returnPopulatedDevice(d, populateDigitalIn)}
-          case DIGITAL_OUT => returnPopulatedDevice(d, populateDigitalOut)
-          case MONITOR => returnPopulatedDevice(d, populateMonitor)
+          case ANALOGUE_IN => populatedDeviceAsJson(d, populateAnalogueIn)
+          case ANALOGUE_OUT => populatedDeviceAsJson(d, populateAnalogueOut)
+          case DIGITAL_IN => {populatedDeviceAsJson(d, populateDigitalIn)}
+          case DIGITAL_OUT => populatedDeviceAsJson(d, populateDigitalOut)
+          case MONITOR => populatedDeviceAsJson(d, populateMonitor)
           case _ => Future.successful(BadRequest(Json.obj("result" -> "Can't read from device")))
         }
       )
     }
   }
 
-  def returnPopulatedDevice(device: Device, populateFn: Device => Device):Future[Result] = {
+  def populatedDeviceAsJson(device: Device, populateFn: Device => Device):Future[Result] = {
     val json = Json.toJson(populateFn(device))
     Future.successful(Ok(json))
   }
@@ -54,26 +54,16 @@ class K8055Controller extends Controller {
     )
   }
 
-  def updateDevice() = addDevice()
+  def updateDevice() = addDevice() //TODO Does this need a different implementation?
 
 
-  def patchDevice() = Action.async(parse.json) {
+  def patchDevice():Action[JsValue] =patchTheDevice(false)
+  def patchDeviceDelta():Action[JsValue] =patchTheDevice(true)
+  def patchTheDevice(isDelta:Boolean):Action[JsValue] = Action.async(parse.json) {
     implicit request => request.body.validate[DeviceState].fold(
       errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       deviceState => {
-        if (DeviceCollection.patchDevice(deviceState, false)) {
-          Future.successful(Ok(Json.obj("message" -> ("Device '"+deviceState.id+"' patched.") )))
-        }
-        else Future.successful(BadRequest(Json.obj("message" -> s"Could not patch device $deviceState.id")))
-      }
-    )
-  }
-
-  def patchDeviceDelta() = Action.async(parse.json) {
-    implicit request => request.body.validate[DeviceState].fold(
-      errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
-      deviceState => {
-        if (DeviceCollection.patchDevice(deviceState, true)) {
+        if (DeviceCollection.patchDevice(deviceState, isDelta)) {
           Future.successful(Ok(Json.obj("message" -> ("Device '"+deviceState.id+"' patched.") )))
         }
         else Future.successful(BadRequest(Json.obj("message" -> s"Could not delta patch device $deviceState.id")))
