@@ -56,10 +56,7 @@ object DeviceCollection{
   }
 
 
-  //TOO much repetition here... need refactoring....
   def updateTransientDigitalOutData(device: Device):Boolean = {
-    println("updateTransientDigitalOutData "+ device)
-
     (device.deviceType, device.digitalState) match{
       case (Device.DIGITAL_OUT, Some(dState)) => {
         K8055Board.setDigitalOut(device.channel, dState)
@@ -79,8 +76,6 @@ object DeviceCollection{
   }
 
   def updateTransientAnalogueOutData(device: Device):Boolean = {
-    println("updateTransientAnalogueOutData "+ device)
-
     (device.deviceType, device.analogueState) match{
       case (Device.ANALOGUE_OUT, Some(aState)) => {
         K8055Board.setAnalogueOut(device.channel, aState)

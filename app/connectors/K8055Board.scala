@@ -1,15 +1,10 @@
 package connector
 
-import scala.annotation.tailrec
-import scala.collection.mutable
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
+import play.Logger
 
 object K8055Board extends K8055Board
 
-/***********************************************************************
- K8055Board: trait for the real thing
-  ************************************************************************/
 trait K8055Board{
 
   // can't read output settings from card, so need to cache state here...
@@ -29,6 +24,8 @@ trait K8055Board{
 
   val LOWEST_BIT = 1
   val HIGHEST_BIT = 8
+
+  val defaultValues = "0;0;0;0;0;0"
 
   /** *******************************************************
     * Analogue Out
@@ -59,8 +56,6 @@ trait K8055Board{
   /** *******************************************************
     * Analogue In
     **********************************************************/
-  //def getAnalogueIn(i:Int): Int ={readAnalogueChannel(i)}
-
   def getAnalogueIn(channel:Int):Int = {
     (channel, readStatus()) match{
       case (1, Some(status)) => status(K8055_ANALOG_1)
@@ -73,7 +68,6 @@ trait K8055Board{
     * Digital Out
     **********************************************************/
   def getDigitalOut(channel:Int): Boolean ={
-//    println(s"######## getDigitalOut - $digitalOut")
     if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT){
       (digitalOut & byteMask(channel)) > 0
     }
@@ -96,7 +90,6 @@ trait K8055Board{
   def setDigitalChannel(channel:Int):Unit = {
     if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT) {
       digitalOut = (digitalOut | byteMask(channel)).toByte
-      println(s"######## setDigitalChannel - $digitalOut")
       setStatus()
     }
   }
@@ -129,7 +122,7 @@ trait K8055Board{
       case (1, Some(status)) => status(K8055_COUNTER_1)
       case (2, Some(status)) => status(K8055_COUNTER_2)
       case _ => {
-        println("Can only get count from channels 1 & 2, not "+channel)
+        Logger.warn("Can only get count from channels 1 & 2, not "+channel)
         0
       }
     }
@@ -181,12 +174,17 @@ trait K8055Board{
     import sys.process.Process
     try{
       val result = Process(""+command+"")
-      result.!!
+      val output = result.!!
+      if (output.indexOf("Could not open the k8055")>=0) {
+        Logger.error("#### Communication with k8055 failed: "+ output)
+        defaultValues
+      }
+      else output
     }
     catch{
-      case e:RuntimeException => {
-        println("Communication with k8055 failed")
-        ""
+      case e:Exception => {
+        Logger.error("#### Communication with k8055 failed. Is k8055 command installed?")
+        defaultValues
       }
     }
   }

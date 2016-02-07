@@ -22,16 +22,12 @@ object MonitorManager extends  MonitorManager{
 
   override def setAnalogueOut(deviceId:String, analogueStateIn:Int):Unit={
     monitors.find(deviceState => deviceState.id == deviceId).fold({
-      println("Not found")
       monitors += new DeviceState(deviceId,None, Some(analogueStateIn))
     })(deviceState => {
-      println("found "+deviceState)
       val newDeviceState = deviceState.copy(analogueState = Some(analogueStateIn))
       monitors = monitors.filter(deviceState => deviceState.id != deviceId)
       monitors += newDeviceState
     })
-
-    println("## MonitorManager.setAnalogueOut: monitors="+ monitors)
   }
 
   override def setDigitalOut(deviceId:String, digitalStateIn:Boolean)={

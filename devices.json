@@ -9,7 +9,7 @@
     "units" : "°c",
     "conversionFactor" : 0.392156862,
     "conversionOffset" : 0,
-    "decimalPlaces" : 1
+    "decimalPlaces" : 2
   }, {
     "id" : "DO-1",
     "description" : "Pump",
