@@ -6,8 +6,8 @@ import play.Logger
 import play.api.libs.json.{Json, JsError, JsSuccess, JsValue}
 import scala.io.Source
 
-
-object DeviceConfigIO {
+object DeviceConfigIO extends DeviceConfigIO
+trait DeviceConfigIO {
 
   def parseDeviceCollection(json: JsValue):Option[DeviceCollection] = {
     json.validate[DeviceCollection] match {

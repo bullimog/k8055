@@ -6,12 +6,24 @@ import model.Device._
 import monitor.MonitorManager
 import model.{DeviceCollection,Device,DeviceState}
 
-object DeviceCollectionController extends DeviceCollectionController
+object DeviceCollectionController extends DeviceCollectionController with DeviceController{
+  override val deviceConfigIO = DeviceConfigIO
+  override val deviceController = DeviceController
+  override val monitorManager = MonitorManager
+  override val configuration = Configuration
+  override val k8055Board = K8055Board
+}
 
 trait DeviceCollectionController{
 
+  val deviceConfigIO:DeviceConfigIO
+  val deviceController:DeviceController
+  val monitorManager:MonitorManager
+  val configuration:Configuration
+  val k8055Board:K8055Board
+
   def getDeviceCollection:DeviceCollection = {
-    val oDeviceCollection: Option[DeviceCollection] = DeviceConfigIO.readDeviceCollectionFromFile(Configuration.filename)
+    val oDeviceCollection: Option[DeviceCollection] = deviceConfigIO.readDeviceCollectionFromFile(configuration.filename)
     oDeviceCollection.fold(DeviceCollection("No Devices", "Error", List()))({
       deviceCollection => deviceCollection
     })
@@ -20,11 +32,11 @@ trait DeviceCollectionController{
   def populateDevices(deviceCollection: DeviceCollection):DeviceCollection = {
     val populatedDevices = deviceCollection.devices.map(device =>
       device.deviceType match {
-        case ANALOGUE_IN => DeviceController.populateAnalogueIn(device)
-        case ANALOGUE_OUT => DeviceController.populateAnalogueOut(device)
-        case DIGITAL_IN => DeviceController.populateDigitalIn(device)
-        case DIGITAL_OUT => DeviceController.populateDigitalOut(device)
-        case MONITOR => DeviceController.populateMonitor(device)
+        case ANALOGUE_IN => deviceController.populateAnalogueIn(device)
+        case ANALOGUE_OUT => deviceController.populateAnalogueOut(device)
+        case DIGITAL_IN => deviceController.populateDigitalIn(device)
+        case DIGITAL_OUT => deviceController.populateDigitalOut(device)
+        case MONITOR => deviceController.populateMonitor(device)
         case _ => device
       }
     )
@@ -47,11 +59,11 @@ trait DeviceCollectionController{
   def updateTransientDigitalOutData(device: Device):Boolean = {
     (device.deviceType, device.digitalState) match{
       case (Device.DIGITAL_OUT, Some(dState)) => {
-        K8055Board.setDigitalOut(device.channel, dState)
+        k8055Board.setDigitalOut(device.channel, dState)
         true
       }
       case (Device.MONITOR, Some(dState)) => {
-        MonitorManager.setDigitalOut(device.id, dState)
+        monitorManager.setDigitalOut(device.id, dState)
         true
       }
       case _ => false
@@ -61,11 +73,11 @@ trait DeviceCollectionController{
   def updateTransientAnalogueOutData(device: Device):Boolean = {
     (device.deviceType, device.analogueState) match{
       case (Device.ANALOGUE_OUT, Some(aState)) => {
-        K8055Board.setAnalogueOut(device.channel, aState)
+        k8055Board.setAnalogueOut(device.channel, aState)
         true
       }
       case (Device.MONITOR, Some(aState)) => {
-        MonitorManager.setAnalogueOut(device.id, aState)
+        monitorManager.setAnalogueOut(device.id, aState)
         true
       }
       case _ => false
@@ -82,7 +94,7 @@ trait DeviceCollectionController{
 
       device.deviceType match {
         case MONITOR => {
-          val aRawState = MonitorManager.getAnalogueOut(device.id)
+          val aRawState = monitorManager.getAnalogueOut(device.id)
           val aState = if (delta)
             aRawState + deviceState.analogueState.getOrElse(0)
           else
@@ -92,7 +104,7 @@ trait DeviceCollectionController{
           updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
         }
         case ANALOGUE_OUT => {
-          val aRawState = K8055Board.getAnalogueOut(device.channel)
+          val aRawState = k8055Board.getAnalogueOut(device.channel)
           val aState = if (delta)
             aRawState + deviceState.analogueState.getOrElse(0)
           else
@@ -117,7 +129,7 @@ trait DeviceCollectionController{
   }
 
   def putDeviceCollection(deviceCollection: DeviceCollection):Boolean = {
-    DeviceConfigIO.writeDeviceCollectionToFile(Configuration.filename, deviceCollection)
+    DeviceConfigIO.writeDeviceCollectionToFile(configuration.filename, deviceCollection)
   }
 
 }
