@@ -1,9 +1,5 @@
 package model
 
-import connector.K8055Board
-import monitor.MonitorManager
-
-import scala.collection.mutable
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Json, JsPath, Reads}
 
@@ -40,24 +36,4 @@ object Device {
 
   implicit val deviceWrites = Json.writes[Device]
 
-  def populateAnalogueIn (device: Device):Device = {
-    device.copy(analogueState = Some(K8055Board.getAnalogueIn(device.channel)))
-  }
-
-  def populateAnalogueOut(device: Device):Device = {
-    device.copy(analogueState = Some(K8055Board.getAnalogueOut(device.channel)))
-  }
-
-  def populateDigitalIn(device: Device):Device = {
-    device.copy(digitalState = Some(K8055Board.getDigitalIn(device.channel)))
-  }
-
-  def populateDigitalOut(device: Device):Device = {
-    device.copy(digitalState = Some(K8055Board.getDigitalOut(device.channel)))
-  }
-
-  def populateMonitor(device: Device):Device = {
-    device.copy(digitalState = Some(MonitorManager.getDigitalOut(device.id)),
-               analogueState = Some(MonitorManager.getAnalogueOut(device.id)))
-  }
 }

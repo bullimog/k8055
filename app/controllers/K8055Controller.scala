@@ -1,12 +1,11 @@
 package controllers
 
-import model.{DeviceState, Device, DeviceCollection}
+import model.{DeviceState, Device}
 import model.Device._
 import play.api.mvc._
 import play.api.libs.json._
 import scala.concurrent.Future
-
-//object K8055Controller extends K8055Controller
+import controllers.DeviceController._
 
 class K8055Controller extends Controller {
 

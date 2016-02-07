@@ -6,9 +6,9 @@ import model.Device._
 import monitor.MonitorManager
 import model.{DeviceCollection,Device,DeviceState}
 
+object DeviceCollectionController extends DeviceCollectionController
 
-
-object DeviceCollectionController{
+trait DeviceCollectionController{
 
   def getDeviceCollection:DeviceCollection = {
     val oDeviceCollection: Option[DeviceCollection] = DeviceConfigIO.readDeviceCollectionFromFile(Configuration.filename)
@@ -20,11 +20,11 @@ object DeviceCollectionController{
   def populateDevices(deviceCollection: DeviceCollection):DeviceCollection = {
     val populatedDevices = deviceCollection.devices.map(device =>
       device.deviceType match {
-        case ANALOGUE_IN => Device.populateAnalogueIn(device)
-        case ANALOGUE_OUT => Device.populateAnalogueOut(device)
-        case DIGITAL_IN => Device.populateDigitalIn(device)
-        case DIGITAL_OUT => Device.populateDigitalOut(device)
-        case MONITOR => Device.populateMonitor(device)
+        case ANALOGUE_IN => DeviceController.populateAnalogueIn(device)
+        case ANALOGUE_OUT => DeviceController.populateAnalogueOut(device)
+        case DIGITAL_IN => DeviceController.populateDigitalIn(device)
+        case DIGITAL_OUT => DeviceController.populateDigitalOut(device)
+        case MONITOR => DeviceController.populateMonitor(device)
         case _ => device
       }
     )
