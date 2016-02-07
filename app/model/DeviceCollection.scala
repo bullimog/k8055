@@ -4,11 +4,8 @@ import connector.K8055Board
 import connectors.{Configuration, DeviceConfigIO}
 import model.Device._
 import monitor.MonitorManager
-import play.api.Play
 import play.api.libs.json.{Json, JsPath, Reads}
 import play.api.libs.functional.syntax._
-
-import scala.concurrent.Future
 
 
 case class DeviceCollection(name: String, description: String, devices: List[Device])
@@ -68,11 +65,6 @@ object DeviceCollection{
       }
       case _ => false
     }
-
-//    if ((device.deviceType == Device.DIGITAL_OUT) && device.digitalState.isDefined) {
-//      K8055Board.setDigitalOut(device.channel, device.digitalState.getOrElse(false))
-//      true
-//    }else false
   }
 
   def updateTransientAnalogueOutData(device: Device):Boolean = {
@@ -81,16 +73,12 @@ object DeviceCollection{
         K8055Board.setAnalogueOut(device.channel, aState)
         true
       }
-      case (Device.MONITOR, Some(dState)) => {
-        MonitorManager.setAnalogueOut(device.id, dState)
+      case (Device.MONITOR, Some(aState)) => {
+        MonitorManager.setAnalogueOut(device.id, aState)
         true
       }
       case _ => false
     }
-//    if(device.deviceType == Device.ANALOGUE_OUT && device.analogueState.isDefined){
-//      K8055Board.setAnalogueOut(device.channel, device.analogueState.getOrElse(0))
-//      true
-//    }else false
   }
 
 
@@ -127,56 +115,6 @@ object DeviceCollection{
     })
   }
 
-//      val aRawState =
-//      if(device.deviceType==MONITOR)
-//        MonitorManager.getAnalogueOut(device.id)
-//      else
-//        K8055Board.getAnalogueOut(device.channel)
-//
-//
-//      val aState:Int =
-//      if(delta)
-//        aRawState + deviceState.analogueState.getOrElse(0)
-//      else
-//        deviceState.analogueState.getOrElse(0)
-//
-//      if(device.deviceType==DIGITAL_OUT)
-//        updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
-//      else
-//        updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
-//    })
-
-
-
-//    devices.find(d => d.id == deviceState.id).exists(device =>
-//      device.deviceType match {
-//        case Device.ANALOGUE_OUT =>
-//          val aState:Int = if(delta) {K8055Board.getAnalogueOut(device.channel) + deviceState.analogueState.getOrElse(-123)}
-//                       else deviceState.analogueState.getOrElse(0)
-//          updateTransientDigitalOutData(device.copy(analogueState = Some(aState)))
-//          true
-//        case Device.DIGITAL_OUT =>
-//          updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
-//          true
-//        case Device.MONITOR =>
-//
-//          updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
-//          true
-//        case _ => false
-//      }
-//    )
-//  }
-
-//  def addDevice(device: Device):Boolean = {
-//    val deviceCollection = getDeviceCollection
-//    val devices:List[Device] = deviceCollection.devices
-//    if(devices.exists(d => d.id == device.id)) false
-//    else {
-//      val deviceAdded = devices ::: List(device)
-//      val dc = deviceCollection.copy(devices = deviceAdded)
-//      putDeviceCollection(dc)
-//    }
-//  }
 
   def deleteDevice(device: Device):Boolean = {deleteDevice(device.id)}
   def deleteDevice(device: String):Boolean = {

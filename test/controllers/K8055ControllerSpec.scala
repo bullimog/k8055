@@ -1,12 +1,13 @@
-import connectors.Configuration
-import model.{DeviceState, Device}
+package controllers
+
 import model.Device._
+import model.{Device, DeviceState}
+import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
-import org.junit.runner._
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
-import play.api.test._
 import play.api.test.Helpers._
+import play.api.test._
 
 @RunWith(classOf[JUnitRunner])
 class K8055ControllerSpec extends Specification {
