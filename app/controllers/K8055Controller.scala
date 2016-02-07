@@ -12,7 +12,7 @@ class K8055Controller extends Controller {
 
   def deviceCollection() = Action.async {
     implicit request => {
-      val json = Json.toJson(DeviceCollection.populateDevices(DeviceCollection.getDeviceCollection))
+      val json = Json.toJson(DeviceCollectionController.populateDevices(DeviceCollectionController.getDeviceCollection))
       Future.successful(Ok(json))
     }
   }
@@ -20,7 +20,7 @@ class K8055Controller extends Controller {
   def getDevice(id:String) = Action.async {
     implicit request => {
       //Maybe find a device with the specified id
-      val deviceCollection = DeviceCollection.getDeviceCollection
+      val deviceCollection = DeviceCollectionController.getDeviceCollection
       val device:Option[Device] = deviceCollection.devices.find(device => device.id == id)
 
       //When a device is found, check its type, populate the transient data and return it.
@@ -46,7 +46,7 @@ class K8055Controller extends Controller {
     implicit request => request.body.validate[Device].fold(
       errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       device => {
-        if (DeviceCollection.upsertDevice(device)) {
+        if (DeviceCollectionController.upsertDevice(device)) {
           Future.successful(Ok(Json.obj("message" -> ("Device '"+device.description+"' saved.") )))
         }
         else Future.successful(BadRequest(Json.obj("message" -> s"Could not add device $device")))
@@ -63,7 +63,7 @@ class K8055Controller extends Controller {
     implicit request => request.body.validate[DeviceState].fold(
       errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       deviceState => {
-        if (DeviceCollection.patchDevice(deviceState, isDelta)) {
+        if (DeviceCollectionController.patchDevice(deviceState, isDelta)) {
           Future.successful(Ok(Json.obj("message" -> ("Device '"+deviceState.id+"' patched.") )))
         }
         else Future.successful(BadRequest(Json.obj("message" -> s"Could not delta patch device $deviceState.id")))
@@ -73,7 +73,7 @@ class K8055Controller extends Controller {
 
 
   def deleteDevice(id:String) = Action.async {
-    if (DeviceCollection.deleteDevice(id))
+    if (DeviceCollectionController.deleteDevice(id))
       Future.successful(Ok(Json.obj("message" -> s"Deleted device $id")))
     else
       Future.successful(BadRequest(Json.obj("message" -> s"Could not delete device $id")))
