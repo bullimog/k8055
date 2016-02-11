@@ -1,6 +1,5 @@
 package connectors
 
-import connector.K8055Board
 import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._

@@ -1,6 +1,6 @@
 package controllers
 
-import connector.K8055Board
+import connectors.K8055Board
 import connectors.{Configuration, DeviceConfigIO}
 import model.Device._
 import monitor.MonitorManager
@@ -43,13 +43,14 @@ trait DeviceCollectionController{
     deviceCollection.copy(devices = populatedDevices)
   }
 
+
   def upsertDevice(device: Device):Boolean = {
     val deviceCollection = getDeviceCollection
     val devices:List[Device] = deviceCollection.devices
     val deviceRemoved = devices.filter(d => d.id != device.id)
     val deviceAdded = deviceRemoved ::: List(device)
     val dc = deviceCollection.copy(devices = deviceAdded)
-    
+
     updateTransientDigitalOutData(device)
     updateTransientAnalogueOutData(device)
     putDeviceCollection(dc)

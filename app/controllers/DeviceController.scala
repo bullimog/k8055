@@ -1,6 +1,6 @@
 package controllers
 
-import connector.K8055Board
+import connectors.K8055Board
 import model.Device
 import monitor.MonitorManager
 
