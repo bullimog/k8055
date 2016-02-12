@@ -95,8 +95,8 @@ trait DeviceCollectionController{
 
       device.deviceType match {
         case MONITOR => {
-          val aRawState = monitorManager.getAnalogueOut(device.id)
-          val aState = if (delta)
+          val aRawState:Int = monitorManager.getAnalogueOut(device.id)
+          val aState:Int = if (delta)
             aRawState + deviceState.analogueState.getOrElse(0)
           else
             deviceState.analogueState.getOrElse(0)

@@ -1,7 +1,7 @@
 package controllers
 
 import connectors.{FakeK8055Board, Configuration, FakeDeviceConfigIO, DeviceConfigIO}
-import model.{Device, DeviceCollection}
+import model.{DeviceState, Device, DeviceCollection}
 import monitor.MonitorManager
 import org.junit.runner.RunWith
 import org.specs2.mutable.Specification
@@ -119,7 +119,88 @@ class DeviceCollectionControllerSpec extends Specification {
       result must equalTo(false)
     }
 
-    //patchDevice
+    object TestDeviceCollectionController2 extends DeviceCollectionController{
+      override val deviceConfigIO = FakeDeviceConfigIO
+      override val deviceController = FakeDeviceController
+      override val monitorManager = FakeMonitorManager
+      override val configuration = Configuration
+      override val k8055Board = FakeK8055Board
+
+      override def updateTransientAnalogueOutData(device: Device) = {
+        latestDevice = if(latestDevice == null) device
+        else latestDevice.copy(analogueState = device.analogueState)
+       true
+      }
+      override def updateTransientDigitalOutData(device: Device) = {
+        latestDevice = if(latestDevice == null) device
+          else latestDevice.copy(digitalState = device.digitalState)
+        true
+      }
+
+
+      var latestDevice:Device = null
+    }
+
+    //Patch Devices
+    "delta patch transient analogue out data should update the device correctly" in new WithApplication {
+      val heaterState =  DeviceState("TEST-AO-1", None, Some(11))
+      TestDeviceCollectionController2.patchDevice(heaterState, true)
+      val result = TestDeviceCollectionController2.latestDevice.analogueState
+      result must equalTo(Some(33))
+    }
+
+    "patch transient analogue out data should update the device correctly" in new WithApplication {
+      val heaterState =  DeviceState("TEST-AO-1", None, Some(11))
+      val succeeded = TestDeviceCollectionController2.patchDevice(heaterState, false)
+      succeeded must equalTo(true)
+      val result = TestDeviceCollectionController2.latestDevice.analogueState
+      result must equalTo(Some(11))
+    }
+
+    "patch transient analogue in data should fail" in new WithApplication {
+      val thermometerState =  DeviceState("TEST-AI-1", None, Some(11))
+      val succeeded = TestDeviceCollectionController2.patchDevice(thermometerState, false)
+      succeeded must equalTo(false)
+    }
+
+    "patch transient digital in data should fail" in new WithApplication {
+      val switchState =  DeviceState("TEST-DI-1", None, Some(11))
+      val succeeded = TestDeviceCollectionController2.patchDevice(switchState, false)
+      succeeded must equalTo(false)
+    }
+
+    "patch transient digital out data should succeed" in new WithApplication {
+      val pumpState =  DeviceState("TEST-DO-1", Some(true), None)
+      val succeeded = TestDeviceCollectionController2.patchDevice(pumpState, false)
+      succeeded must equalTo(true)
+      val result = TestDeviceCollectionController2.latestDevice.digitalState
+      result must equalTo(Some(true))
+    }
+
+    "delta patch transient analogue monitor data should update the device correctly" in new WithApplication {
+      val thermometerState =  DeviceState("TEST-MO-1", None, Some(11))
+      val succeeded = TestDeviceCollectionController2.patchDevice(thermometerState, true)
+      succeeded must equalTo(true)
+      val aResult = TestDeviceCollectionController2.latestDevice.analogueState
+      aResult must equalTo(Some(12)) //FakeMonitorManager.getAnalogueOut returns 1, so 11+1=12
+    }
+
+    "patch transient analogue monitor data should update the device correctly" in new WithApplication {
+      val thermostatState =  DeviceState("TEST-MO-1", None, Some(11))
+      val succeeded = TestDeviceCollectionController2.patchDevice(thermostatState, false)
+      succeeded must equalTo(true)
+      val aResult = TestDeviceCollectionController2.latestDevice.analogueState
+      aResult must equalTo(Some(11))
+    }
+
+    "patch transient digital monitor data should update the device correctly" in new WithApplication {
+      val thermostatState =  DeviceState("TEST-MO-1", Some(true), None)
+      TestDeviceCollectionController2.patchDevice(thermostatState, false)
+      val dResult = TestDeviceCollectionController2.latestDevice.digitalState
+      dResult must equalTo(Some(true))
+    }
+
+
 
     //deleteDevice
 
