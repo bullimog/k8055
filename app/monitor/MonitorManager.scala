@@ -31,7 +31,9 @@ object MonitorManager extends  MonitorManager{
   }
 
   override def setDigitalOut(deviceId:String, digitalStateIn:Boolean)={
-    monitors.find(deviceState => deviceState.id == deviceId).map(deviceState => {
+    monitors.find(deviceState => deviceState.id == deviceId).fold({
+      monitors += new DeviceState(deviceId, Some(digitalStateIn), None)
+    })(deviceState => {
       val newDeviceState = deviceState.copy(digitalState = Some(digitalStateIn))
       monitors = monitors.filter(deviceState => deviceState.id != deviceId)
       monitors += newDeviceState
