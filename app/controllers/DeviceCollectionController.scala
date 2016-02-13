@@ -130,7 +130,7 @@ trait DeviceCollectionController{
   }
 
   def putDeviceCollection(deviceCollection: DeviceCollection):Boolean = {
-    DeviceConfigIO.writeDeviceCollectionToFile(configuration.filename, deviceCollection)
+    deviceConfigIO.writeDeviceCollectionToFile(configuration.filename, deviceCollection)
   }
 
 }

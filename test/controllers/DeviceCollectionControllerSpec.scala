@@ -2,12 +2,10 @@ package controllers
 
 import connectors.{FakeK8055Board, Configuration, FakeDeviceConfigIO, DeviceConfigIO}
 import model.{DeviceState, Device, DeviceCollection}
-import monitor.MonitorManager
 import org.junit.runner.RunWith
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
-import play.api.test.Helpers._
-import play.api.test.{FakeRequest, WithApplication}
+import play.api.test.{WithApplication}
 import model.Device._
 import monitor.FakeMonitorManager
 
@@ -200,15 +198,58 @@ class DeviceCollectionControllerSpec extends Specification {
       dResult must equalTo(Some(true))
     }
 
+    //putDeviceCollection
+    "almost pointless test, to ensure writeDeviceCollectionToFile is invoked" in new WithApplication {
+      val dc = TestDeviceCollectionController2.getDeviceCollection
+      val result = TestDeviceCollectionController2.putDeviceCollection(dc)
+      result must equalTo(true)
+    }
 
+
+    object TestDeviceCollectionController3 extends DeviceCollectionController{
+      override val deviceConfigIO = FakeDeviceConfigIO
+      override val deviceController = FakeDeviceController
+      override val monitorManager = FakeMonitorManager
+      override val configuration = Configuration
+      override val k8055Board = FakeK8055Board
+
+      var latestDeviceCollection:DeviceCollection = null
+
+      override def putDeviceCollection(deviceCollection: DeviceCollection):Boolean = {
+        latestDeviceCollection = deviceCollection
+        true
+      }
+    }
 
     //deleteDevice
+    "delete device that exists should update the device collection correctly" in new WithApplication {
+      val deviceId = "TEST-DI-1"
+      val isInThere = TestDeviceCollectionController3.getDeviceCollection.devices.find(device => device.id==deviceId)
+      isInThere must not equals(None)
+      val switch = Device(deviceId, "test-switch", DIGITAL_IN, 1, digitalState = Some(false))
+      TestDeviceCollectionController3.deleteDevice(switch)
+      val dResult = TestDeviceCollectionController3.latestDeviceCollection.devices.find(device => device.id==deviceId)
+      dResult must equalTo(None)
+    }
 
-    //putDeviceCollection
+    "delete device (by id) that exists should update the device collection correctly" in new WithApplication {
+      val deviceId = "TEST-AI-1"
+      val isInThere = TestDeviceCollectionController3.getDeviceCollection.devices.find(device => device.id==deviceId)
+      isInThere must not equals(None)
+      TestDeviceCollectionController3.deleteDevice(deviceId)
+      val dResult = TestDeviceCollectionController3.latestDeviceCollection.devices.find(device => device.id==deviceId)
+      dResult must equalTo(None)
+    }
 
+    "handle a request to delete device that does not exist should leave device collection" in new WithApplication {
+      val deviceId = "FAKE-AI-1"
+      val isInThere = TestDeviceCollectionController3.getDeviceCollection.devices.find(device => device.id==deviceId)
+      isInThere must equalTo(None)
+      val thermometer = Device(deviceId, "test-thermometer", ANALOGUE_IN, 1, Some("%"), Some(0), analogueState = Some(0))
+      val success = TestDeviceCollectionController3.deleteDevice(thermometer)
+      success must equalTo(true)
+      val dResult = TestDeviceCollectionController3.latestDeviceCollection.devices.find(device => device.id==deviceId)
+      dResult must equalTo(None)
+    }
   }
-
-
-
-
 }
