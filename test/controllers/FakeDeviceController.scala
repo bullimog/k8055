@@ -1,9 +1,12 @@
 package controllers
 
+import connectors.FakeK8055Board
 import model.Device
 
 
 object FakeDeviceController extends DeviceController{
+
+  override val k8055Board = FakeK8055Board
 
   override def populateAnalogueIn (device: Device):Device = {
     device.copy(analogueState = Some(0))

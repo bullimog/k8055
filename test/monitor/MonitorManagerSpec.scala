@@ -59,6 +59,7 @@ class MonitorManagerSpec extends Specification{
       MonitorManager.getAnalogueOut(testId) must equalTo(testAnalogueVal2)
     }
 
+
     "adds Device state for a new device and record the digital out for the device" in new WithApplication {
       val testId = "TEST-DO-1"
 
