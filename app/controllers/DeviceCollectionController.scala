@@ -29,6 +29,11 @@ trait DeviceCollectionController{
     })
   }
 
+  def getDevice(deviceId:String):Option[Device]={
+    val deviceCollection:DeviceCollection = getDeviceCollection
+    deviceCollection.devices.find(device => device.id == deviceId)
+  }
+
   def populateDevices(deviceCollection: DeviceCollection):DeviceCollection = {
     val populatedDevices = deviceCollection.devices.map(device =>
       device.deviceType match {

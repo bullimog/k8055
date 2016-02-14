@@ -11,6 +11,8 @@ object DeviceController extends DeviceController{
 
 trait DeviceController {
   val k8055Board:K8055Board
+
+
   def populateAnalogueIn (device: Device):Device = {
     device.copy(analogueState = Some(k8055Board.getAnalogueIn(device.channel)))
   }
