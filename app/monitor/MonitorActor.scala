@@ -5,18 +5,18 @@ import controllers.DeviceCollectionController
 import model.{DeviceState, Device, DeviceCollection}
 import play.api.Logger
 
-class MonitorActor extends MonitorActorTrait{
+class MonitorActor extends MonitorActorTrait with Actor{
   override val deviceCollectionController = DeviceCollectionController
-}
-
-trait MonitorActorTrait extends Actor{
-  val deviceCollectionController:DeviceCollectionController
 
   def receive = {
     case "tick" => processActiveMonitors()
     case "stop" => context.stop(self)
     case _ => Logger.error("unknown message in MonitorActor")
   }
+}
+
+trait MonitorActorTrait{
+  val deviceCollectionController:DeviceCollectionController
 
   def processActiveMonitors() = {
     activeMonitors.foreach(monitor => {
