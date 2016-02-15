@@ -13,23 +13,23 @@ trait DeviceController {
   val k8055Board:K8055Board
 
 
-  def populateAnalogueIn (device: Device):Device = {
+  def readAndPopulateAnalogueIn (device: Device):Device = {
     device.copy(analogueState = Some(k8055Board.getAnalogueIn(device.channel)))
   }
 
-  def populateAnalogueOut(device: Device):Device = {
+  def readAndPopulateAnalogueOut(device: Device):Device = {
     device.copy(analogueState = Some(k8055Board.getAnalogueOut(device.channel)))
   }
 
-  def populateDigitalIn(device: Device):Device = {
+  def readAndPopulateDigitalIn(device: Device):Device = {
     device.copy(digitalState = Some(k8055Board.getDigitalIn(device.channel)))
   }
 
-  def populateDigitalOut(device: Device):Device = {
+  def readAndPopulateDigitalOut(device: Device):Device = {
     device.copy(digitalState = Some(k8055Board.getDigitalOut(device.channel)))
   }
 
-  def populateMonitor(device: Device):Device = {
+  def readAndPopulateMonitor(device: Device):Device = {
     device.copy(digitalState = Some(MonitorManager.getDigitalOut(device.id)),
       analogueState = Some(MonitorManager.getAnalogueOut(device.id)))
   }

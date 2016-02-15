@@ -25,7 +25,7 @@ trait MonitorActorTrait{
   }
 
   def activeMonitors:List[Device]={
-    val dc:DeviceCollection = deviceCollectionController.populateDevices(deviceCollectionController.getDeviceCollection)
+    val dc:DeviceCollection = deviceCollectionController.readAndPopulateDevices(deviceCollectionController.getDeviceCollection)
     val monitors = dc.devices.filter(device=> device.deviceType==Device.MONITOR)
     monitors.filter(device=>device.digitalState.fold(false)(digitalState=>digitalState))
   }
@@ -53,10 +53,14 @@ trait MonitorActorTrait{
   }
 
 
-  def calculateOutputSetting(tempDiff: Int): Int ={
-    if(tempDiff > 2.0) 100
-    else if(tempDiff < 0) 0
-    else tempDiff * 50
+  def calculateOutputSetting(measurementDiff: Int): Int ={
+    val maxPermittedDiff = 7
+    val maxOutput = 255
+    val outputFactor = 40
+
+    if(measurementDiff > maxPermittedDiff) maxOutput
+    else if(measurementDiff < 0) 0
+    else measurementDiff * outputFactor
   }
 
 }

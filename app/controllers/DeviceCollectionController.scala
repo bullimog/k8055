@@ -34,14 +34,15 @@ trait DeviceCollectionController{
     deviceCollection.devices.find(device => device.id == deviceId)
   }
 
-  def populateDevices(deviceCollection: DeviceCollection):DeviceCollection = {
+  
+  def readAndPopulateDevices(deviceCollection: DeviceCollection):DeviceCollection = {
     val populatedDevices = deviceCollection.devices.map(device =>
       device.deviceType match {
-        case ANALOGUE_IN => deviceController.populateAnalogueIn(device)
-        case ANALOGUE_OUT => deviceController.populateAnalogueOut(device)
-        case DIGITAL_IN => deviceController.populateDigitalIn(device)
-        case DIGITAL_OUT => deviceController.populateDigitalOut(device)
-        case MONITOR => deviceController.populateMonitor(device)
+        case ANALOGUE_IN => deviceController.readAndPopulateAnalogueIn(device)
+        case ANALOGUE_OUT => deviceController.readAndPopulateAnalogueOut(device)
+        case DIGITAL_IN => deviceController.readAndPopulateDigitalIn(device)
+        case DIGITAL_OUT => deviceController.readAndPopulateDigitalOut(device)
+        case MONITOR => deviceController.readAndPopulateMonitor(device)
         case _ => device
       }
     )
@@ -100,9 +101,10 @@ trait DeviceCollectionController{
 
       device.deviceType match {
         case MONITOR => {
-          val aRawState:Int = monitorManager.getAnalogueOut(device.id)
-          val aState:Int = if (delta)
+          val aState:Int = if (delta) {
+            val aRawState: Int = monitorManager.getAnalogueOut(device.id)
             aRawState + deviceState.analogueState.getOrElse(0)
+          }
           else
             deviceState.analogueState.getOrElse(0)
 
@@ -110,9 +112,10 @@ trait DeviceCollectionController{
           updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
         }
         case ANALOGUE_OUT => {
-          val aRawState = k8055Board.getAnalogueOut(device.channel)
-          val aState = if (delta)
+          val aState = if (delta) {
+            val aRawState = k8055Board.getAnalogueOut(device.channel)
             aRawState + deviceState.analogueState.getOrElse(0)
+          }
           else
             deviceState.analogueState.getOrElse(0)
 

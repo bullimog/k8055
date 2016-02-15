@@ -34,7 +34,7 @@ class DeviceCollectionControllerSpec extends Specification {
     }
 
     "populate devices with transient data" in new WithApplication {
-      val populatedDc = TestDeviceCollectionController.populateDevices(FakeDeviceConfigIO.deviceCollection)
+      val populatedDc = TestDeviceCollectionController.readAndPopulateDevices(FakeDeviceConfigIO.deviceCollection)
       populatedDc.devices.foreach(device =>
 
         device.deviceType match{

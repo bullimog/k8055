@@ -54,7 +54,7 @@ trait K8055Board{
   }
 
   /** *******************************************************
-    * Analogue In
+    * Analogue In  0 - 255
     **********************************************************/
   def getAnalogueIn(channel:Int):Int = {
     (channel, readStatus()) match{

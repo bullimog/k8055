@@ -31,7 +31,7 @@ object FakeDeviceCollectionController extends DeviceCollectionController{
     DeviceCollection("Fake Name", "Fake Description", fakeDevices)
   }
 
-  override def populateDevices(deviceCollection: DeviceCollection):DeviceCollection ={
+  override def readAndPopulateDevices(deviceCollection: DeviceCollection):DeviceCollection ={
     getDeviceCollection
   }
 

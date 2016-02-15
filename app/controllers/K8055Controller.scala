@@ -11,7 +11,7 @@ class K8055Controller extends Controller {
 
   def deviceCollection() = Action.async {
     implicit request => {
-      val json = Json.toJson(DeviceCollectionController.populateDevices(DeviceCollectionController.getDeviceCollection))
+      val json = Json.toJson(DeviceCollectionController.readAndPopulateDevices(DeviceCollectionController.getDeviceCollection))
       Future.successful(Ok(json))
     }
   }
@@ -25,11 +25,11 @@ class K8055Controller extends Controller {
       //When a device is found, check its type, populate the transient data and return it.
       device.fold(Future.successful(BadRequest(Json.obj("result" -> "Can't find device")))) (
         d => d.deviceType match{
-          case ANALOGUE_IN => populatedDeviceAsJson(d, populateAnalogueIn)
-          case ANALOGUE_OUT => populatedDeviceAsJson(d, populateAnalogueOut)
-          case DIGITAL_IN => {populatedDeviceAsJson(d, populateDigitalIn)}
-          case DIGITAL_OUT => populatedDeviceAsJson(d, populateDigitalOut)
-          case MONITOR => populatedDeviceAsJson(d, populateMonitor)
+          case ANALOGUE_IN => populatedDeviceAsJson(d, readAndPopulateAnalogueIn)
+          case ANALOGUE_OUT => populatedDeviceAsJson(d, readAndPopulateAnalogueOut)
+          case DIGITAL_IN => {populatedDeviceAsJson(d, readAndPopulateDigitalIn)}
+          case DIGITAL_OUT => populatedDeviceAsJson(d, readAndPopulateDigitalOut)
+          case MONITOR => populatedDeviceAsJson(d, readAndPopulateMonitor)
           case _ => Future.successful(BadRequest(Json.obj("result" -> "Can't read from device")))
         }
       )
