@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
   along with BulliBrew.  If not, see <http://www.gnu.org/licenses/>.
   */
-package monitor
+package manager
 
 import model.DeviceState
 import org.junit.runner.RunWith

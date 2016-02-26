@@ -1,9 +1,10 @@
 package controllers
 
+import manager.DeviceCollectionManager
 import model.Device._
 import model.{DeviceState, Device, DeviceCollection}
 
-object FakeDeviceCollectionController extends DeviceCollectionController{
+object FakeDeviceCollectionManager extends DeviceCollectionManager{
   override val deviceConfigIO = null
   override val deviceController = null
   override val monitorManager = null

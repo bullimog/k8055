@@ -1,23 +1,21 @@
-package controllers
+package manager
 
-import connectors.K8055Board
-import connectors.{Configuration, DeviceConfigIO}
+import connectors.{Configuration, DeviceConfigIO, K8055Board}
 import model.Device._
-import monitor.MonitorManager
-import model.{DeviceCollection,Device,DeviceState}
+import model.{Device, DeviceCollection, DeviceState}
 
-object DeviceCollectionController extends DeviceCollectionController with DeviceController{
+object DeviceCollectionManager extends DeviceCollectionManager with DeviceManager{
   override val deviceConfigIO = DeviceConfigIO
-  override val deviceController = DeviceController
+  override val deviceController = DeviceManager
   override val monitorManager = MonitorManager
   override val configuration = Configuration
   override val k8055Board = K8055Board
 }
 
-trait DeviceCollectionController{
+trait DeviceCollectionManager{
 
   val deviceConfigIO:DeviceConfigIO
-  val deviceController:DeviceController
+  val deviceController:DeviceManager
   val monitorManager:MonitorManager
   val configuration:Configuration
   val k8055Board:K8055Board

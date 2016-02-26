@@ -1,15 +1,14 @@
-package controllers
+package manager
 
 import connectors.K8055Board
 import model.Device
-import monitor.MonitorManager
 
 
-object DeviceController extends DeviceController{
+object DeviceManager extends DeviceManager{
   override val k8055Board = K8055Board
 }
 
-trait DeviceController {
+trait DeviceManager {
   val k8055Board:K8055Board
 
 

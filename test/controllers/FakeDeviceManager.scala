@@ -1,10 +1,11 @@
 package controllers
 
 import connectors.FakeK8055Board
+import manager.DeviceManager
 import model.Device
 
 
-object FakeDeviceController extends DeviceController{
+object FakeDeviceManager extends DeviceManager{
 
   override val k8055Board = FakeK8055Board
 

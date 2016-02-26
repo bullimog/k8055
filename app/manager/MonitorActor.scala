@@ -1,12 +1,11 @@
-package monitor
+package manager
 
 import akka.actor.Actor
-import controllers.DeviceCollectionController
 import model.{DeviceState, Device, DeviceCollection}
 import play.api.Logger
 
 class MonitorActor extends MonitorActorTrait with Actor{
-  override val deviceCollectionController = DeviceCollectionController
+  override val deviceCollectionController = DeviceCollectionManager
 
   def receive = {
     case "tick" => processActiveMonitors()
@@ -16,7 +15,7 @@ class MonitorActor extends MonitorActorTrait with Actor{
 }
 
 trait MonitorActorTrait{
-  val deviceCollectionController:DeviceCollectionController
+  val deviceCollectionController:DeviceCollectionManager
 
   def processActiveMonitors() = {
     activeMonitors.foreach(monitor => {

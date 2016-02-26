@@ -1,4 +1,4 @@
-package monitor
+package manager
 
 import model.DeviceState
 

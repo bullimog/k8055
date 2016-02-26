@@ -1,6 +1,6 @@
 import java.util.concurrent.TimeUnit
 import akka.actor.{ActorRef, ActorSystem, Props}
-import monitor.MonitorActor
+import manager.MonitorActor
 import play.api._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.FiniteDuration
