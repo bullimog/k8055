@@ -2,9 +2,8 @@ package manager
 
 
 import model.DeviceState
-
 import scala.collection.mutable
-
+import util.Util._
 
 trait MonitorManager {
 
@@ -20,21 +19,24 @@ trait MonitorManager {
 
 object MonitorManager extends  MonitorManager{
 
-  override def setAnalogueOut(deviceId:String, analogueStateIn:Int):Unit={
+  override def setAnalogueOut(deviceId:String, analogueStateOut:Int):Unit={
+
+    val bAnalogueStateOut = boundByteValue(analogueStateOut)
+
     monitors.find(deviceState => deviceState.id == deviceId).fold({
-      monitors += new DeviceState(deviceId,None, Some(analogueStateIn))
+      monitors += new DeviceState(deviceId,None, Some(bAnalogueStateOut))
     })(deviceState => {
-      val newDeviceState = deviceState.copy(analogueState = Some(analogueStateIn))
+      val newDeviceState = deviceState.copy(analogueState = Some(bAnalogueStateOut))
       monitors = monitors.filter(deviceState => deviceState.id != deviceId)
       monitors += newDeviceState
     })
   }
 
-  override def setDigitalOut(deviceId:String, digitalStateIn:Boolean)={
+  override def setDigitalOut(deviceId:String, digitalStateOut:Boolean)={
     monitors.find(deviceState => deviceState.id == deviceId).fold({
-      monitors += new DeviceState(deviceId, Some(digitalStateIn), None)
+      monitors += new DeviceState(deviceId, Some(digitalStateOut), None)
     })(deviceState => {
-      val newDeviceState = deviceState.copy(digitalState = Some(digitalStateIn))
+      val newDeviceState = deviceState.copy(digitalState = Some(digitalStateOut))
       monitors = monitors.filter(deviceState => deviceState.id != deviceId)
       monitors += newDeviceState
     })

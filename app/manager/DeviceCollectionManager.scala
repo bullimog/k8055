@@ -71,6 +71,7 @@ trait DeviceCollectionManager{
         monitorManager.setDigitalOut(device.id, dState)
         true
       }
+      case (Device.MONITOR, None) => true
       case _ => false
     }
   }

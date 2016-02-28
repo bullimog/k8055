@@ -1,11 +1,10 @@
 package manager
 
 import akka.actor.{Props, ActorRef, ActorSystem}
-import controllers.FakeDeviceCollectionManager
+import controllers.{FakeDeviceManager, FakeDeviceCollectionManager}
 import org.junit.runner.RunWith
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
-import org.specs2.mock._
 import play.api.test.WithApplication
 
 
@@ -14,6 +13,7 @@ class MonitorActorSpec extends Specification{
 
   object TestMonitorActor extends MonitorActorTrait{
     override val deviceCollectionController = FakeDeviceCollectionManager
+    override val deviceManager = FakeDeviceManager
   }
 
 
@@ -28,28 +28,30 @@ class MonitorActorSpec extends Specification{
     }
 
 
-    "Not change anything, when there is one active Monitor which is on target" in new WithApplication{
+    "Not change anything, when there is one active Monitor which is on target" in{
       FakeDeviceCollectionManager.heaterAnalogueState = 0
-      FakeDeviceCollectionManager.thermometerAnalogueState = 2000
-      FakeDeviceCollectionManager.thermostatAnalogueState = 2000
+      FakeDeviceCollectionManager.thermometerAnalogueState = 0
+      FakeDeviceCollectionManager.thermostatAnalogueState = 0
       FakeDeviceCollectionManager.thermostatDigitalState = true
       TestMonitorActor.processActiveMonitors()
       FakeDeviceCollectionManager.lastDeviceState.analogueState must equalTo(Some(0))
     }
 
-    "Set Monitor increaser, when there is one active Monitor which is below target" in new WithApplication{
+    "Set Monitor increaser, when there is one active Monitor which is below target" in{
+      FakeDeviceManager.fakeAnalogueState = 190 //for sensor
       FakeDeviceCollectionManager.heaterAnalogueState = 0
-      FakeDeviceCollectionManager.thermometerAnalogueState = 2000
-      FakeDeviceCollectionManager.thermostatAnalogueState = 2001
+//      FakeDeviceCollectionManager.thermometerAnalogueState = 190
+      FakeDeviceCollectionManager.thermostatAnalogueState = 191
       FakeDeviceCollectionManager.thermostatDigitalState = true
       TestMonitorActor.processActiveMonitors()
       FakeDeviceCollectionManager.lastDeviceState.analogueState must equalTo(Some(40))
     }
 
-    "Switch off Monitor increaser, when there is an active Monitor which is above target" in new WithApplication {
+    "Switch off Monitor increaser, when there is an active Monitor which is above target" in {
+      FakeDeviceManager.fakeAnalogueState = 190 //for sensor
       FakeDeviceCollectionManager.heaterAnalogueState = 0
-      FakeDeviceCollectionManager.thermometerAnalogueState = 2000
-      FakeDeviceCollectionManager.thermostatAnalogueState = 1999
+//      FakeDeviceCollectionManager.thermometerAnalogueState = 190
+      FakeDeviceCollectionManager.thermostatAnalogueState = 189
       FakeDeviceCollectionManager.thermostatDigitalState = true
       TestMonitorActor.processActiveMonitors()
       FakeDeviceCollectionManager.lastDeviceState.analogueState must equalTo(Some(0))

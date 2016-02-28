@@ -26,11 +26,11 @@ class K8055BoardSpec extends Specification {
       k8055Board.analogueOut1 must equalTo(25500)
 
 
-      k8055Board.setAnaloguePercentageOut(1, 50)
-      k8055Board.getAnaloguePercentageOut(1) must equalTo(50)
+      k8055Board.setAnalogueOut(1, 127)
+//      k8055Board.getAnaloguePercentageOut(1) must equalTo(50)
       k8055Board.getAnAnalogueOut(1, 100) must equalTo(127)
       k8055Board.lastCommand must equalTo("k8055 -d:0 -a1:127 -a2:0")
-      k8055Board.analogueOut1 must equalTo(12750)
+      k8055Board.analogueOut1 must equalTo(12700)
 
 
       k8055Board.fakeBoardResponse = "0;24;25;26;27;28"  //just some numbers to match against

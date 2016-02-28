@@ -44,7 +44,7 @@ class K8055Controller extends Controller {
 
   def addDevice() = Action.async(parse.json) {
     implicit request => request.body.validate[Device].fold(
-      errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
+    errors => {Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))},
       device => {
         if (DeviceCollectionManager.upsertDevice(device)) {
           Future.successful(Ok(Json.obj("message" -> ("Device '"+device.description+"' saved.") )))

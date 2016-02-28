@@ -20,7 +20,9 @@
     "description" : "Heater",
     "deviceType" : 2,
     "channel" : 1,
-    "units" : "%"
+    "units" : "%",
+    "conversionFactor" : 0.392156862,
+    "decimalPlaces" : 1
   }, {
     "id" : "DI-1",
     "description" : "Switch",
@@ -36,6 +38,8 @@
     "description" : "Thermostat",
     "deviceType" : 5,
     "channel" : 0,
+    "conversionFactor" : 0.392156862,
+    "decimalPlaces" : 1,
     "monitorSensor" : "AI-1",
     "monitorIncreaser" : "AO-1"
   } ]

@@ -6,6 +6,7 @@ import play.api.Logger
 
 class MonitorActor extends MonitorActorTrait with Actor{
   override val deviceCollectionController = DeviceCollectionManager
+  override val deviceManager = DeviceManager
 
   def receive = {
     case "tick" => processActiveMonitors()
@@ -16,6 +17,7 @@ class MonitorActor extends MonitorActorTrait with Actor{
 
 trait MonitorActorTrait{
   val deviceCollectionController:DeviceCollectionManager
+  val deviceManager:DeviceManager
 
   def processActiveMonitors() = {
     activeMonitors.foreach(monitor => {
@@ -31,13 +33,15 @@ trait MonitorActorTrait{
 
 
   def performMonitor(monitor: Device):Unit= {
+
     for {
       sensor <- monitor.monitorSensor.flatMap(id => deviceCollectionController.getDevice(id))
       increaser <- monitor.monitorIncreaser.flatMap(id => deviceCollectionController.getDevice(id))
       //decreaser <- monitor.monitorDecreaser.flatMap(id => deviceCollectionController.getDevice(id))
       target <- monitor.analogueState
     } yield {
-      val sensorTargetDiff:Int = sensor.analogueState.fold(0)(sensorState => target - sensorState)
+      val popSensor = deviceManager.readAndPopulateAnalogueIn(sensor)
+      val sensorTargetDiff:Int = popSensor.analogueState.fold(0)(sensorState => target - sensorState)
 
       if (sensorTargetDiff > 0) //switch on increaser only
         updateOutputDevice(increaser, calculateOutputSetting(sensorTargetDiff))
@@ -53,6 +57,7 @@ trait MonitorActorTrait{
 
 
   def calculateOutputSetting(measurementDiff: Int): Int ={
+    //TODO: Add these into config
     val maxPermittedDiff = 7
     val maxOutput = 255
     val outputFactor = 40

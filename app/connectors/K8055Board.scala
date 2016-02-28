@@ -2,6 +2,7 @@ package connectors
 
 
 import play.Logger
+import util.Util._
 
 object K8055Board extends K8055Board
 
@@ -27,10 +28,12 @@ trait K8055Board{
 
   val defaultValues = "0;0;0;0;0;0"
 
+
+
   /** *******************************************************
     * Analogue Out
     **********************************************************/
-  def getAnaloguePercentageOut(channel:Int): Int ={getAnAnalogueOut(channel, percentToStoreFactor)}
+//  def getAnaloguePercentageOut(channel:Int): Int ={getAnAnalogueOut(channel, percentToStoreFactor)}
   def getAnalogueOut(channel:Int): Int ={getAnAnalogueOut(channel, byteToStoreFactor)}
   def getAnAnalogueOut(channel:Int, factor: Double): Int ={
 
@@ -41,12 +44,12 @@ trait K8055Board{
     }
   }
 
-  def setAnaloguePercentageOut(channel:Int, value:Int): Unit ={setAnAnalogueOut(channel, value, percentToStoreFactor)}
+//  def setAnaloguePercentageOut(channel:Int, value:Int): Unit ={setAnAnalogueOut(channel, value, percentToStoreFactor)}
   def setAnalogueOut(channel:Int, value:Int): Unit ={setAnAnalogueOut(channel, value, byteToStoreFactor)}
   def setAnAnalogueOut(channel:Int, value:Int, factor:Double): Unit ={
     channel match{
-      case 1 => analogueOut1 = (value * factor).toInt
-      case 2 => analogueOut2 = (value * factor).toInt
+      case 1 => analogueOut1 = (boundByteValue(value) * factor).toInt
+      case 2 => analogueOut2 = (boundByteValue(value) * factor).toInt
       case _ =>
     }
 
