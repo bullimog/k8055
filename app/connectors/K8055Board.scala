@@ -33,7 +33,6 @@ trait K8055Board{
   /** *******************************************************
     * Analogue Out
     **********************************************************/
-//  def getAnaloguePercentageOut(channel:Int): Int ={getAnAnalogueOut(channel, percentToStoreFactor)}
   def getAnalogueOut(channel:Int): Int ={getAnAnalogueOut(channel, byteToStoreFactor)}
   def getAnAnalogueOut(channel:Int, factor: Double): Int ={
 
@@ -44,7 +43,6 @@ trait K8055Board{
     }
   }
 
-//  def setAnaloguePercentageOut(channel:Int, value:Int): Unit ={setAnAnalogueOut(channel, value, percentToStoreFactor)}
   def setAnalogueOut(channel:Int, value:Int): Unit ={setAnAnalogueOut(channel, value, byteToStoreFactor)}
   def setAnAnalogueOut(channel:Int, value:Int, factor:Double): Unit ={
     channel match{
@@ -186,7 +184,7 @@ trait K8055Board{
     }
     catch{
       case e:Exception => {
-        Logger.error("#### Communication with k8055 failed. Is k8055 command installed?")
+        Logger.error("#### Communication with k8055 failed. Is k8055 command installed? "+e)
         defaultValues
       }
     }
