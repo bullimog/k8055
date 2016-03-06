@@ -32,7 +32,8 @@
     "id" : "TI-1",
     "description" : "Clock",
     "deviceType" : 0,
-    "channel" : 0
+    "channel" : 0,
+    "units" : "seconds"
   }, {
     "id" : "MO-1",
     "description" : "Thermostat",

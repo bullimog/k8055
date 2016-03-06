@@ -26,6 +26,7 @@ class K8055Controller extends Controller {
       //When a device is found, check its type, populate the transient data and return it.
       device.fold(Future.successful(NotFound(Json.obj("result" -> "Can't find device")))) (
         d => d.deviceType match{
+          case TIMER => populatedDeviceAsJson(d, readTimer)
           case ANALOGUE_IN => populatedDeviceAsJson(d, readAndPopulateAnalogueIn)
           case ANALOGUE_OUT => populatedDeviceAsJson(d, readAndPopulateAnalogueOut)
           case DIGITAL_IN => {populatedDeviceAsJson(d, readAndPopulateDigitalIn)}

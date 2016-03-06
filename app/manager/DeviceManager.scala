@@ -11,7 +11,7 @@ object DeviceManager extends DeviceManager{
 trait DeviceManager {
   val k8055Board:K8055Board
 
-
+  def readTimer (device: Device):Device = { device }
   def readAndPopulateAnalogueIn (device: Device):Device = {
     device.copy(analogueState = Some(k8055Board.getAnalogueIn(device.channel)))
   }
