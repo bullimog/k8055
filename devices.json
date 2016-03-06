@@ -29,9 +29,9 @@
     "deviceType" : 3,
     "channel" : 1
   }, {
-    "id" : "TI-1",
-    "description" : "Clock",
-    "deviceType" : 0,
+    "id" : "DI-2",
+    "description" : "Switch 2",
+    "deviceType" : 3,
     "channel" : 0,
     "units" : "seconds"
   }, {

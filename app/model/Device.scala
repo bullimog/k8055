@@ -11,7 +11,7 @@ case class Device(id: String, description: String, deviceType: Int, channel:Int,
                   digitalState:Option[Boolean] = None, analogueState:Option[Int] = None)
 
 object Device {
-  val TIMER = 0         // e.g. Clock
+//  val TIMER = 0         // e.g. Clock
   val ANALOGUE_IN = 1   // e.g. Thermometer
   val ANALOGUE_OUT = 2  // e.g. Heater or Cooler
   val DIGITAL_IN = 3    // e.g. Button or Switch
