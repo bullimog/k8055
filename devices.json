@@ -39,6 +39,7 @@
     "description" : "Thermostat",
     "deviceType" : 5,
     "channel" : 0,
+    "units" : "°c",
     "conversionFactor" : 0.392156862,
     "decimalPlaces" : 1,
     "monitorSensor" : "AI-1",
