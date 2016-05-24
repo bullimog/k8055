@@ -9,7 +9,7 @@ trait MonitorManager {
 
   var monitors:mutable.MutableList[DeviceState] = mutable.MutableList()
 
-  def setAnalogueOut(deviceId:String, analogueState:Int)
+  def setAnalogueOut(deviceId:String, analogueState:Int):Boolean
   def setDigitalOut(deviceId:String, digitalState:Boolean)
   def getAnalogueOut(deviceId:String):Int
   def getDigitalOut(deviceId:String):Boolean
@@ -19,17 +19,18 @@ trait MonitorManager {
 
 object MonitorManager extends  MonitorManager{
 
-  override def setAnalogueOut(deviceId:String, analogueStateOut:Int):Unit={
+  override def setAnalogueOut(deviceId:String, analogueStateOut:Int):Boolean={
 
-    val bAnalogueStateOut = boundByteValue(analogueStateOut)
+    val byteAnalogueStateOut = boundByteValue(analogueStateOut)
 
     monitors.find(deviceState => deviceState.id == deviceId).fold({
-      monitors += new DeviceState(deviceId,None, Some(bAnalogueStateOut))
+      monitors += new DeviceState(deviceId,None, Some(byteAnalogueStateOut))
     })(deviceState => {
-      val newDeviceState = deviceState.copy(analogueState = Some(bAnalogueStateOut))
+      val newDeviceState = deviceState.copy(analogueState = Some(byteAnalogueStateOut))
       monitors = monitors.filter(deviceState => deviceState.id != deviceId)
       monitors += newDeviceState
     })
+    true
   }
 
   override def setDigitalOut(deviceId:String, digitalStateOut:Boolean)={

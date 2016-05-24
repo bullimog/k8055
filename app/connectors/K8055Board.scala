@@ -43,8 +43,8 @@ trait K8055Board{
     }
   }
 
-  def setAnalogueOut(channel:Int, value:Int): Unit ={setAnAnalogueOut(channel, value, byteToStoreFactor)}
-  def setAnAnalogueOut(channel:Int, value:Int, factor:Double): Unit ={
+  def setAnalogueOut(channel:Int, value:Int): Boolean ={setAnAnalogueOut(channel, value, byteToStoreFactor)}
+  def setAnAnalogueOut(channel:Int, value:Int, factor:Double): Boolean ={
     channel match{
       case 1 => analogueOut1 = (boundByteValue(value) * factor).toInt
       case 2 => analogueOut2 = (boundByteValue(value) * factor).toInt
@@ -75,11 +75,11 @@ trait K8055Board{
     else{false}
   }
 
-  def setDigitalOut(channel:Int, isOn:Boolean): Unit ={
+  def setDigitalOut(channel:Int, isOn:Boolean): Boolean ={
     if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT) {
       if (isOn) setDigitalChannel(channel)
       else clearDigitalChannel(channel)
-    }
+    } else false
   }
 
   //converts 1-8 to a binary digit mask
@@ -88,18 +88,20 @@ trait K8055Board{
   }
 
 
-  def setDigitalChannel(channel:Int):Unit = {
+  def setDigitalChannel(channel:Int):Boolean = {
     if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT) {
       digitalOut = (digitalOut | byteMask(channel)).toByte
       setStatus()
     }
+    else false
   }
 
-  def clearDigitalChannel(channel:Int):Unit = {
+  def clearDigitalChannel(channel:Int):Boolean = {
     if(channel >= LOWEST_BIT && channel <= HIGHEST_BIT) {
       digitalOut = (digitalOut & (255 - byteMask(channel))).toByte
       setStatus()
     }
+    else false
   }
 
 
@@ -129,7 +131,9 @@ trait K8055Board{
     }
   }
 
-  def resetCount(channel: Int): Unit = {executeCommand(s"k8055 -reset$channel")}
+  def resetCount(channel: Int): Boolean = {
+    executeCommand(s"k8055 -reset$channel") != defaultValues
+  }
 
   def getDigitalInLatch(channel: Int):Boolean = {
     val pressed:Boolean = getCount(channel) > 0
@@ -146,29 +150,35 @@ trait K8055Board{
    * @return Option[ Array[Int] ] representing the read values from the board
    */
   def readStatus():Option[Array[Int]] = {
-    val retValues = executeCommand(s"k8055").replaceAll("\n","").split(';')
-    try {
-      val expectedValCount = 6
-      if (retValues.length == expectedValCount) {
-        Some(for (strValue <- retValues)
-             yield {strValue.toInt}
-        )
+    val result = executeCommand(s"k8055")
+    if(result != defaultValues) {
+      val retValues = result.replaceAll("\n", "").split(';')
+      try {
+        val expectedValCount = 6
+        if (retValues.length == expectedValCount) {
+          Some(for (strValue <- retValues)
+            yield {
+              strValue.toInt
+            }
+          )
+        }
+        else None
       }
-      else None
+      catch {
+        case e: NumberFormatException => None
+      }
     }
-    catch {
-      case e:NumberFormatException =>  None
-    }
+    else None
   }
 
-  def resetStatus():String = {
-    executeCommand(s"k8055 -d:0 -a1:0 -a2:0 -reset1 -reset2")
+  def resetStatus():Boolean = {
+    executeCommand(s"k8055 -d:0 -a1:0 -a2:0 -reset1 -reset2") != defaultValues
   }
 
-  private def setStatus():String = {
+  private def setStatus():Boolean = {
     val byteVal1:Int = analogueOut1/byteToStoreFactor
     val byteVal2:Int = analogueOut2/byteToStoreFactor
-    executeCommand(s"k8055 -d:$digitalOut -a1:$byteVal1 -a2:$byteVal2")
+    executeCommand(s"k8055 -d:$digitalOut -a1:$byteVal1 -a2:$byteVal2") != defaultValues
   }
 
   def executeCommand(command:String): String = {
