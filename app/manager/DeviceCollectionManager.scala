@@ -78,13 +78,10 @@ trait DeviceCollectionManager{
 
   def updateTransientAnalogueOutData(device: Device):Boolean = {
     (device.deviceType, device.analogueState) match{
-      case (Device.ANALOGUE_OUT, Some(aState)) => {
+      case (Device.ANALOGUE_OUT, Some(aState)) =>
         k8055Board.setAnalogueOut(device.channel, aState)
-        true
-      }
       case (Device.MONITOR, Some(aState)) => {
         monitorManager.setAnalogueOut(device.id, aState)
-        true
       }
       case _ => false
     }
