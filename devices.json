@@ -14,7 +14,7 @@
     "id" : "DO-1",
     "description" : "Pump",
     "deviceType" : 4,
-    "channel" : 1
+    "channel" : 7
   }, {
     "id" : "AO-1",
     "description" : "Heater",
