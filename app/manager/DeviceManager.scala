@@ -19,6 +19,7 @@ trait DeviceManager {
       case Device.ANALOGUE_OUT => readAndPopulateAnalogueOut(device)
       case Device.DIGITAL_IN => readAndPopulateDigitalIn(device)
       case Device.DIGITAL_OUT => readAndPopulateDigitalOut(device)
+      case _ => device
     }
   }
 
