@@ -28,6 +28,7 @@ trait K8055Board{
 
   val retryLimit = 3
   val defaultValues = "0;0;0;0;0;0"
+  val expectedValCount = 6
 
 
 
@@ -155,7 +156,6 @@ trait K8055Board{
     if(result != defaultValues) {
       val retValues = result.replaceAll("\n", "").split(';')
       try {
-        val expectedValCount = 6
         if (retValues.length == expectedValCount) {
           Some(for (strValue <- retValues)
             yield {
