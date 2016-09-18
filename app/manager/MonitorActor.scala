@@ -46,7 +46,7 @@ trait MonitorActorTrait{
   }
   
 
-  private def monitorAnalogueIn(activeMonitor: Device, analogueSensor: Device)  {
+  private[manager] def monitorAnalogueIn(activeMonitor: Device, analogueSensor: Device)  {
     for {
       increaser <- activeMonitor.monitorIncreaser.flatMap(id => deviceCollectionController.getDevice(id))
     } yield {
@@ -56,7 +56,7 @@ trait MonitorActorTrait{
     }
   }
   
-  private def monitorAnalogueInToAnalogueOut(activeMonitor:Device, analogueSensor:Device, increaser:Device) = {
+  private[manager] def monitorAnalogueInToAnalogueOut(activeMonitor:Device, analogueSensor:Device, increaser:Device) = {
     for {
       target <- activeMonitor.analogueState
     }
@@ -70,13 +70,13 @@ trait MonitorActorTrait{
     }
   }
 
-  def updateAnalogueOutputDevice(outputDevice:Device, outputVal:Int) = {
+  private[manager] def updateAnalogueOutputDevice(outputDevice:Device, outputVal:Int) = {
     val outputDeviceState = DeviceState(outputDevice.id, None, Some(outputVal))
     deviceCollectionController.patchDevice(outputDeviceState, delta = false)
   }
 
 
-  private def monitorDigitalIn(activeMonitor: Device, digitalSensor:Device) = {
+  private[manager] def monitorDigitalIn(activeMonitor: Device, digitalSensor:Device) = {
     for {
       increaser <- activeMonitor.monitorIncreaser.flatMap(id => deviceCollectionController.getDevice(id))
     } yield {
@@ -86,27 +86,26 @@ trait MonitorActorTrait{
     }
   }
 
-  private def monitorDigitalInToDigitalOut(activeMonitor:Device, digitalSensor:Device, increaser:Device) = {
+  private[manager] def monitorDigitalInToDigitalOut(activeMonitor:Device, digitalSensor:Device, increaser:Device) = {
     for {
       flipDigital <- activeMonitor.flipDigitalMonitorState
     }
     yield {
-      digitalSensor.digitalState.fold() { sensorDigitalState =>
+      digitalSensor.digitalState.fold() { sensorDigitalState => {
         val digitalState:Boolean = if (flipDigital) !sensorDigitalState else sensorDigitalState
         updateDigitalOutputDevice(increaser, digitalState)
-      }
-
+      }}
     }
   }
 
-  def updateDigitalOutputDevice(outputDevice:Device, outputState:Boolean) = {
+  private[manager] def updateDigitalOutputDevice(outputDevice:Device, outputState:Boolean) = {
     val outputDeviceState = DeviceState(outputDevice.id, Some(outputState), None)
     deviceCollectionController.patchDevice(outputDeviceState, delta = false)
   }
 
 
 
-  def calculateOutputSetting(measurementDiff: Int): Int ={
+  private[manager] def calculateOutputSetting(measurementDiff: Int): Int ={
     //TODO: Add these into config
     val maxPermittedDiff = 7
     val maxOutput = 255

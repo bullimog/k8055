@@ -57,6 +57,42 @@ class MonitorActorSpec extends Specification{
       FakeDeviceCollectionManager.lastDeviceState.analogueState must equalTo(Some(0))
     }
 
+    "Not switch on Pump, when the monitor is disabled" in {
+      FakeDeviceCollectionManager.pumpState = false
+      FakeDeviceCollectionManager.switchState = true
+      FakeDeviceCollectionManager.overflowMonitorDigitalState = false
+      TestMonitorActor.processActiveMonitors()
+      FakeDeviceCollectionManager.lastDeviceState.digitalState must equalTo(None)
+    }
+
+    "Switch on Pump, when the monitor is enabled and switch is on" in {
+      FakeDeviceManager.fakeDigitalState = true //for sensor (switch)
+      FakeDeviceCollectionManager.pumpState = false
+      FakeDeviceCollectionManager.switchState = false
+      FakeDeviceCollectionManager.overflowMonitorDigitalState = true
+      TestMonitorActor.processActiveMonitors()
+      FakeDeviceCollectionManager.lastDeviceState.digitalState must equalTo(Some(true))
+    }
+
+    "Switch off Pump, when the monitor is enabled and switch is on and flipDigitalState is true" in {
+      FakeDeviceManager.fakeDigitalState = true //for sensor (switch)
+      FakeDeviceCollectionManager.pumpState = false
+      FakeDeviceCollectionManager.switchState = false
+      FakeDeviceCollectionManager.flipPumpState = true
+      FakeDeviceCollectionManager.overflowMonitorDigitalState = true
+      TestMonitorActor.processActiveMonitors()
+      FakeDeviceCollectionManager.lastDeviceState.digitalState must equalTo(Some(false))
+    }
+
+    "Switch on Pump, when the monitor is enabled and switch is off and flipDigitalState is true" in {
+      FakeDeviceManager.fakeDigitalState = false //for sensor (switch)
+      FakeDeviceCollectionManager.pumpState = false
+      FakeDeviceCollectionManager.switchState = false
+      FakeDeviceCollectionManager.flipPumpState = true
+      FakeDeviceCollectionManager.overflowMonitorDigitalState = true
+      TestMonitorActor.processActiveMonitors()
+      FakeDeviceCollectionManager.lastDeviceState.digitalState must equalTo(Some(true))
+    }
 
     "calculate the output setting properly when it is a lot above target " in {
       val result = TestMonitorActor.calculateOutputSetting(8)
