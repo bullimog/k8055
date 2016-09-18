@@ -90,5 +90,12 @@
     "decimalPlaces" : 1,
     "monitorSensor" : "AI-1",
     "monitorIncreaser" : "AO-1"
+  }, {
+    "id" : "MO-2",
+    "description" : "Overflow Monitor",
+    "deviceType" : 5,
+    "channel" : 0,
+    "monitorSensor" : "DI-1",
+    "monitorIncreaser" : "DO-4"
   } ]
 }
