@@ -27,7 +27,7 @@ object FakeDeviceCollectionManager extends DeviceCollectionManager{
     val thermometer = Device("TEST-AI-1", "test-thermometer", ANALOGUE_IN, 1, Some("%"), Some(0),
       analogueState = Some(thermometerAnalogueState))
     val thermostat = Device("TEST-MO-1", "Thermostat", MONITOR, 1, Some("c"), None, None, None, Some("TEST-AI-1"),
-      Some("TEST-AO-1"), Some("TEST-AO-2"), Some(thermostatDigitalState), Some(thermostatAnalogueState) )
+      Some("TEST-AO-1"), Some("TEST-AO-2"), Some(thermostatDigitalState), None, Some(thermostatAnalogueState) )
     val fakeDevices:List[Device] = List(pump, heater, switch, thermometer, thermostat)
     DeviceCollection("Fake Name", "Fake Description", fakeDevices)
   }

@@ -32,28 +32,78 @@ trait MonitorActorTrait{
   }
 
 
-  def performMonitor(monitor: Device):Unit= {
-
+  def performMonitor(activeMonitor: Device):Unit= {
     for {
-      sensor <- monitor.monitorSensor.flatMap(id => deviceCollectionController.getDevice(id))
-      increaser <- monitor.monitorIncreaser.flatMap(id => deviceCollectionController.getDevice(id))
-      //decreaser <- monitor.monitorDecreaser.flatMap(id => deviceCollectionController.getDevice(id))
-      target <- monitor.analogueState
+      sensor <- activeMonitor.monitorSensor.flatMap(id => deviceCollectionController.getDevice(id))
     } yield {
-      val popSensor = deviceManager.readAndPopulateAnalogueIn(sensor)
-      val sensorTargetDiff:Int = popSensor.analogueState.fold(0)(sensorState => target - sensorState)
+      val popSensor = deviceManager.readAndPopulateDevice(sensor)
+
+      if (sensor.deviceType == Device.ANALOGUE_IN)
+        monitorAnalogueIn(activeMonitor, popSensor)
+      else if(sensor.deviceType == Device.DIGITAL_IN)
+        monitorDigitalIn(activeMonitor, popSensor)
+    }
+  }
+  
+
+  private def monitorAnalogueIn(activeMonitor: Device, analogueSensor: Device)  {
+    for {
+      increaser <- activeMonitor.monitorIncreaser.flatMap(id => deviceCollectionController.getDevice(id))
+    } yield {
+      if(increaser.deviceType == Device.ANALOGUE_OUT) {
+        monitorAnalogueInToAnalogueOut(activeMonitor, analogueSensor, increaser)
+      }
+    }
+  }
+  
+  private def monitorAnalogueInToAnalogueOut(activeMonitor:Device, analogueSensor:Device, increaser:Device) = {
+    for {
+      target <- activeMonitor.analogueState
+    }
+    yield {
+      val sensorTargetDiff: Int = analogueSensor.analogueState.fold(0)(sensorState => target - sensorState)
 
       if (sensorTargetDiff > 0) //switch on increaser only
-        updateOutputDevice(increaser, calculateOutputSetting(sensorTargetDiff))
+        updateAnalogueOutputDevice(increaser, calculateOutputSetting(sensorTargetDiff))
       else
-        updateOutputDevice(increaser, 0)
+        updateAnalogueOutputDevice(increaser, 0)
     }
   }
 
-  def updateOutputDevice(outputDevice:Device, outputVal:Int) = {
+  def updateAnalogueOutputDevice(outputDevice:Device, outputVal:Int) = {
     val outputDeviceState = DeviceState(outputDevice.id, None, Some(outputVal))
     deviceCollectionController.patchDevice(outputDeviceState, delta = false)
   }
+
+
+  private def monitorDigitalIn(activeMonitor: Device, digitalSensor:Device) = {
+    for {
+      increaser <- activeMonitor.monitorIncreaser.flatMap(id => deviceCollectionController.getDevice(id))
+    } yield {
+      if(increaser.deviceType == Device.DIGITAL_OUT) {
+        monitorDigitalInToDigitalOut(activeMonitor, digitalSensor, increaser)
+      }
+    }
+  }
+
+  private def monitorDigitalInToDigitalOut(activeMonitor:Device, digitalSensor:Device, increaser:Device) = {
+    for {
+      flipDigital <- activeMonitor.flipDigitalMonitorState
+    }
+    yield {
+      digitalSensor.digitalState.fold() { sensorDigitalState =>
+        val digitalState:Boolean = if (flipDigital) !sensorDigitalState else sensorDigitalState
+        updateDigitalOutputDevice(increaser, digitalState)
+      }
+
+    }
+  }
+
+  def updateDigitalOutputDevice(outputDevice:Device, outputState:Boolean) = {
+    val outputDeviceState = DeviceState(outputDevice.id, Some(outputState), None)
+    deviceCollectionController.patchDevice(outputDeviceState, delta = false)
+  }
+
 
 
   def calculateOutputSetting(measurementDiff: Int): Int ={

@@ -8,7 +8,8 @@ case class Device(id: String, description: String, deviceType: Int, channel:Int,
                   conversionFactor:Option[Double] = None, conversionOffset:Option[Double] = None,
                   decimalPlaces:Option[Int] = None, monitorSensor:Option[String] = None,
                   monitorIncreaser:Option[String] = None, monitorDecreaser:Option[String] = None,
-                  digitalState:Option[Boolean] = None, analogueState:Option[Int] = None)
+                  digitalState:Option[Boolean] = None, flipDigitalMonitorState:Option[Boolean] = Some(false),
+                  analogueState:Option[Int] = None)
 
 object Device {
 //  val TIMER = 0         // e.g. Clock
@@ -16,7 +17,7 @@ object Device {
   val ANALOGUE_OUT = 2  // e.g. Heater or Cooler
   val DIGITAL_IN = 3    // e.g. Button or Switch
   val DIGITAL_OUT = 4   // e.g. Pump
-  val MONITOR = 5       // e.g. Thermostat
+  val MONITOR = 5       // e.g. Thermostat or overflow guard
 
   implicit val deviceReads: Reads[Device] = (
     (JsPath \ "id").read[String] and
@@ -31,6 +32,7 @@ object Device {
       (JsPath \ "monitorIncreaser").readNullable[String] and
       (JsPath \ "monitorDecreaser").readNullable[String] and
       (JsPath \ "digitalState").readNullable[Boolean] and
+      (JsPath \ "flipDigitalMonitorState").readNullable[Boolean] and
       (JsPath \ "analogueState").readNullable[Int]
     )(Device.apply _)
 
