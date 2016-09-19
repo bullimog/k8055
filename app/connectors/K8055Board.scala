@@ -193,14 +193,14 @@ trait K8055Board{
         val result = Process("" + command + "")
         val output = result.!!
         if (output.indexOf("Could not open the k8055") >= 0) {
-          Logger.error("#### Communication with k8055 failed: " + output)
+          //Logger.error("#### Communication with k8055 failed: " + output)
           tryCommand(command, tries - 1)
         }
         else output
       }
       catch {
         case e: Exception => {
-          Logger.error("#### Communication with k8055 failed. Is k8055 command installed? " + e)
+          //Logger.error("#### Communication with k8055 failed. Is k8055 command installed? " + e)
           tryCommand(command, tries - 1)
         }
       }
