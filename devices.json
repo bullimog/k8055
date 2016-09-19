@@ -19,42 +19,42 @@
     "conversionFactor" : 0.392156862,
     "conversionOffset" : 0,
     "decimalPlaces" : 2
-  },{
+  }, {
     "id" : "DO-1",
     "description" : "Hopper",
     "deviceType" : 4,
     "channel" : 1
-  },{
+  }, {
     "id" : "DO-2",
     "description" : "Chiller",
     "deviceType" : 4,
     "channel" : 2
-  },{
+  }, {
     "id" : "DO-3",
     "description" : "Mash Valve",
     "deviceType" : 4,
     "channel" : 3
-  },{
+  }, {
     "id" : "DO-4",
     "description" : "Wort Pump",
     "deviceType" : 4,
     "channel" : 4
-  },{
+  }, {
     "id" : "DO-5",
     "description" : "Boil Valve",
     "deviceType" : 4,
     "channel" : 5
-  },{
+  }, {
     "id" : "DO-6",
     "description" : "Boil Select",
     "deviceType" : 4,
     "channel" : 6
-  },{
+  }, {
     "id" : "DO-7",
     "description" : "Mash Pump",
     "deviceType" : 4,
     "channel" : 7
-  },{
+  }, {
     "id" : "DO-8",
     "description" : "Boil Pump",
     "deviceType" : 4,
@@ -67,7 +67,7 @@
     "units" : "%",
     "conversionFactor" : 0.392156862,
     "decimalPlaces" : 1
-  },{
+  }, {
     "id" : "AO-2",
     "description" : "Boiler",
     "deviceType" : 2,
@@ -90,5 +90,13 @@
     "decimalPlaces" : 1,
     "monitorSensor" : "AI-1",
     "monitorIncreaser" : "AO-1"
+  }, {
+    "id" : "MO-2",
+    "description" : "Overflow Monitor",
+    "deviceType" : 5,
+    "channel" : 0,
+    "flipDigitalMonitorState": true,
+    "monitorSensor" : "DI-1",
+    "monitorIncreaser" : "DO-4"
   } ]
 }

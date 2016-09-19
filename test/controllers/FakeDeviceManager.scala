@@ -11,6 +11,15 @@ object FakeDeviceManager extends DeviceManager{
   var fakeAnalogueState:Int = 0
   var fakeDigitalState:Boolean = false
 
+  override def readAndPopulateDevice(device: Device):Device = {
+    device.deviceType match {
+      case Device.ANALOGUE_IN => readAndPopulateAnalogueIn(device)
+      case Device.ANALOGUE_OUT => readAndPopulateAnalogueOut(device)
+      case Device.DIGITAL_IN => readAndPopulateDigitalIn(device)
+      case Device.DIGITAL_OUT => readAndPopulateDigitalOut(device)
+    }
+  }
+
   override def readAndPopulateAnalogueIn (device: Device):Device = {
     device.copy(analogueState = Some(fakeAnalogueState))
   }

@@ -12,6 +12,17 @@ trait DeviceManager {
   val k8055Board:K8055Board
 
   def readTimer (device: Device):Device = { device }
+
+  def readAndPopulateDevice(device: Device):Device = {
+    device.deviceType match {
+      case Device.ANALOGUE_IN => readAndPopulateAnalogueIn(device)
+      case Device.ANALOGUE_OUT => readAndPopulateAnalogueOut(device)
+      case Device.DIGITAL_IN => readAndPopulateDigitalIn(device)
+      case Device.DIGITAL_OUT => readAndPopulateDigitalOut(device)
+      case _ => device
+    }
+  }
+
   def readAndPopulateAnalogueIn (device: Device):Device = {
     device.copy(analogueState = Some(k8055Board.getAnalogueIn(device.channel)))
   }

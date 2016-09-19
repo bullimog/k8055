@@ -26,7 +26,9 @@ trait K8055Board{
   val LOWEST_BIT = 1
   val HIGHEST_BIT = 8
 
+  val retryLimit = 3
   val defaultValues = "0;0;0;0;0;0"
+  val expectedValCount = 6
 
 
 
@@ -154,7 +156,6 @@ trait K8055Board{
     if(result != defaultValues) {
       val retValues = result.replaceAll("\n", "").split(';')
       try {
-        val expectedValCount = 6
         if (retValues.length == expectedValCount) {
           Some(for (strValue <- retValues)
             yield {
@@ -182,21 +183,31 @@ trait K8055Board{
   }
 
   def executeCommand(command:String): String = {
-    import sys.process.Process
-    try{
-      val result = Process(""+command+"")
-      val output = result.!!
-      if (output.indexOf("Could not open the k8055")>=0) {
-        Logger.error("#### Communication with k8055 failed: "+ output)
-        defaultValues
+    tryCommand(command, retryLimit)
+  }
+
+  def tryCommand(command:String, tries:Int): String = {
+    if (tries > 0) {
+      import sys.process.Process
+      try {
+        val result = Process("" + command + "")
+        val output = result.!!
+        if (output.indexOf("Could not open the k8055") >= 0) {
+          //Logger.error("#### Communication with k8055 failed: " + output)
+          tryCommand(command, tries - 1)
+        }
+        else output
       }
-      else output
+      catch {
+        case e: Exception => {
+          //Logger.error("#### Communication with k8055 failed. Is k8055 command installed? " + e)
+          tryCommand(command, tries - 1)
+        }
+      }
     }
-    catch{
-      case e:Exception => {
-        Logger.error("#### Communication with k8055 failed. Is k8055 command installed? "+e)
-        defaultValues
-      }
+    else {
+      Logger.error(s"#### Tried $retryLimit times, but couldn't get a good response from k8055")
+      defaultValues
     }
   }
 }

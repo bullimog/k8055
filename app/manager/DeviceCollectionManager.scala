@@ -35,14 +35,10 @@ trait DeviceCollectionManager{
   
   def readAndPopulateDevices(deviceCollection: DeviceCollection):DeviceCollection = {
     val populatedDevices = deviceCollection.devices.map(device =>
-      device.deviceType match {
-        case ANALOGUE_IN => deviceController.readAndPopulateAnalogueIn(device)
-        case ANALOGUE_OUT => deviceController.readAndPopulateAnalogueOut(device)
-        case DIGITAL_IN => deviceController.readAndPopulateDigitalIn(device)
-        case DIGITAL_OUT => deviceController.readAndPopulateDigitalOut(device)
-        case MONITOR => deviceController.readAndPopulateMonitor(device)
-        case _ => device
-      }
+      if(device.deviceType == MONITOR)
+        deviceController.readAndPopulateMonitor(device)
+      else
+        deviceController.readAndPopulateDevice(device)
     )
     deviceCollection.copy(devices = populatedDevices)
   }
