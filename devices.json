@@ -25,15 +25,14 @@
     "decimalPlaces" : 1
   }, {
     "id" : "DI-1",
-    "description" : "Switch",
+    "description" : "Wort Overflow",
     "deviceType" : 3,
     "channel" : 1
   }, {
     "id" : "DI-2",
-    "description" : "Switch 2",
+    "description" : "Wort Underflow",
     "deviceType" : 3,
-    "channel" : 0,
-    "units" : "seconds"
+    "channel" : 2
   }, {
     "id" : "MO-1",
     "description" : "Thermostat",
@@ -44,5 +43,13 @@
     "decimalPlaces" : 1,
     "monitorSensor" : "AI-1",
     "monitorIncreaser" : "AO-1"
+  }, {
+    "id" : "MO-2",
+    "description" : "Overflow Monitor",
+    "deviceType" : 5,
+    "channel" : 0,
+    "monitorSensor" : "DI-1",
+    "monitorIncreaser" : "DO-4",
+    "flipDigitalMonitorState" : true
   } ]
 }
