@@ -63,7 +63,7 @@ class DeviceCollectionControllerSpec extends Specification {
     }
 
     "update transient digital data for a monitor should succeed" in new WithApplication {
-      val thermostat = Device("TEST-MO-1", "Thermostat", MONITOR, 1, Some("c"), None, None, None, Some("TEST-AI-1"), Some("TEST-AO-1"), None, Some(false), Some(0) )
+      val thermostat = Device("TEST-MO-1", "Thermostat", MONITOR, 1, Some("c"), None, None, None, Some("TEST-AI-1"), Some("TEST-AO-1"), None, Some(false), None, Some(0) )
       val result = TestDeviceCollectionManager.updateTransientDigitalOutData(thermostat)
       result must equalTo(true)
     }
@@ -94,7 +94,7 @@ class DeviceCollectionControllerSpec extends Specification {
     }
 
     "update transient analogue data for a monitor should succeed" in new WithApplication {
-      val thermostat = Device("TEST-MO-1", "Thermostat", MONITOR, 1, Some("c"), None, None, None, Some("TEST-AI-1"), Some("TEST-AO-1"), None, Some(false), Some(0) )
+      val thermostat = Device("TEST-MO-1", "Thermostat", MONITOR, 1, Some("c"), None, None, None, Some("TEST-AI-1"), Some("TEST-AO-1"), None, Some(false), None, Some(0) )
       val result = TestDeviceCollectionManager.updateTransientAnalogueOutData(thermostat)
       result must equalTo(true)
     }
