@@ -61,7 +61,7 @@
     "channel" : 8
   }, {
     "id" : "AO-1",
-    "description" : "Masher",
+    "description" : "Mash Heater",
     "deviceType" : 2,
     "channel" : 1,
     "units" : "%",
@@ -69,7 +69,7 @@
     "decimalPlaces" : 1
   }, {
     "id" : "AO-2",
-    "description" : "Boiler",
+    "description" : "Boil Heater",
     "deviceType" : 2,
     "channel" : 2,
     "units" : "%",
@@ -77,14 +77,24 @@
     "decimalPlaces" : 1
   }, {
     "id" : "DI-1",
-    "description" : "Wort Overflow",
+    "description" : "Mash Overflow",
     "deviceType" : 3,
     "channel" : 1
   }, {
     "id" : "DI-2",
-    "description" : "Wort Underflow",
+    "description" : "Mash Underflow",
     "deviceType" : 3,
     "channel" : 2
+  }, {
+    "id" : "DI-3",
+    "description" : "Wort Overflow",
+    "deviceType" : 3,
+    "channel" : 3
+  }, {
+    "id" : "DI-4",
+    "description" : "Wort Underflow",
+    "deviceType" : 3,
+    "channel" : 4
   }, {
     "id" : "MO-1",
     "description" : "Thermostat",
