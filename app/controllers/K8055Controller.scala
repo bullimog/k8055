@@ -32,6 +32,7 @@ class K8055Controller extends Controller {
           case DIGITAL_IN => {populatedDeviceAsJson(d, readAndPopulateDigitalIn)}
           case DIGITAL_OUT => populatedDeviceAsJson(d, readAndPopulateDigitalOut)
           case MONITOR => populatedDeviceAsJson(d, readAndPopulateMonitor)
+          case STROBE => populatedDeviceAsJson(d, readAndPopulateStrobe)
           case _ => Future.successful(BadRequest(Json.obj("result" -> "Can't read from device")))
         }
       )

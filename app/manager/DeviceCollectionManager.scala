@@ -37,6 +37,8 @@ trait DeviceCollectionManager{
     val populatedDevices = deviceCollection.devices.map(device =>
       if(device.deviceType == MONITOR)
         deviceController.readAndPopulateMonitor(device)
+      else if(device.deviceType == STROBE)
+        deviceController.readAndPopulateStrobe(device)
       else
         deviceController.readAndPopulateDevice(device)
     )
@@ -68,6 +70,11 @@ trait DeviceCollectionManager{
         true
       }
       case (Device.MONITOR, None) => true
+      case (Device.STROBE, Some(dState)) => {
+        monitorManager.setDigitalOut(device.id, dState)
+        true
+      }
+      case (Device.STROBE, None) => true
       case _ => false
     }
   }
@@ -84,6 +91,14 @@ trait DeviceCollectionManager{
   }
 
 
+  def getMonitorOrStrobeAnalogueOut(delta: Boolean, monitorOrStrobe: Device, monitorOrStrobeState: DeviceState) : Int = {
+    if (delta) {
+      val aRawState: Int = monitorManager.getAnalogueOut(monitorOrStrobe.id)
+      aRawState + monitorOrStrobeState.analogueState.getOrElse(0)
+    }
+    else
+      monitorOrStrobeState.analogueState.getOrElse(0)
+  }
 
   def patchDevice(deviceState: DeviceState, delta:Boolean):Boolean = {
     val deviceCollection = getDeviceCollection
@@ -92,13 +107,15 @@ trait DeviceCollectionManager{
     devices.find(d => d.id == deviceState.id).exists( device => {
 
       device.deviceType match {
+        case STROBE => {
+          val aState:Int = getMonitorOrStrobeAnalogueOut(delta, device, deviceState)
+
+          updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
+          updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
+          // change actor state, perhaps ???
+        }
         case MONITOR => {
-          val aState:Int = if (delta) {
-            val aRawState: Int = monitorManager.getAnalogueOut(device.id)
-            aRawState + deviceState.analogueState.getOrElse(0)
-          }
-          else
-            deviceState.analogueState.getOrElse(0)
+          val aState:Int = getMonitorOrStrobeAnalogueOut(delta, device, deviceState)
 
           updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
           updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))

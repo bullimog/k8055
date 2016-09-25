@@ -18,6 +18,7 @@ object Device {
   val DIGITAL_IN = 3    // e.g. Button or Switch
   val DIGITAL_OUT = 4   // e.g. Pump
   val MONITOR = 5       // e.g. Thermostat or overflow guard
+  val STROBE = 6       // e.g. Pump pulser
 
   implicit val deviceReads: Reads[Device] = (
     (JsPath \ "id").read[String] and
