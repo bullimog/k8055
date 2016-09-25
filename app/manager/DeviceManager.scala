@@ -45,6 +45,9 @@ trait DeviceManager {
   }
 
   def readAndPopulateStrobe(device: Device):Device = {
-    device.copy(digitalState = Some(MonitorManager.getDigitalOut(device.id)))
+    device.copy(digitalState = Some(MonitorManager.getDigitalOut(device.id)),
+      analogueState = Some(MonitorManager.getAnalogueOut(device.id)),
+      analogueState2 = Some(MonitorManager.getAnalogueOut2(device.id))
+    )
   }
 }

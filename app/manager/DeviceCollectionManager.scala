@@ -86,6 +86,19 @@ trait DeviceCollectionManager{
       case (Device.MONITOR, Some(aState)) => {
         monitorManager.setAnalogueOut(device.id, aState)
       }
+      case (Device.STROBE, Some(aState)) => {
+        monitorManager.setAnalogueOut(device.id, aState)
+      }
+      case _ => false
+    }
+  }
+
+  def updateTransientAnalogueOutData2(device: Device):Boolean = {
+    println("########## updateTransientAnalogueOutData2 " + device)
+    (device.deviceType, device.analogueState2) match{
+      case (Device.STROBE, Some(aState)) => {
+        monitorManager.setAnalogueOut2(device.id, aState)
+      }
       case _ => false
     }
   }
@@ -100,6 +113,15 @@ trait DeviceCollectionManager{
       monitorOrStrobeState.analogueState.getOrElse(0)
   }
 
+  def getMonitorOrStrobeAnalogueOut2(delta: Boolean, monitorOrStrobe: Device, monitorOrStrobeState: DeviceState) : Int = {
+    if (delta) {
+      val aRawState: Int = monitorManager.getAnalogueOut2(monitorOrStrobe.id)
+      aRawState + monitorOrStrobeState.analogueState2.getOrElse(0)
+    }
+    else
+      monitorOrStrobeState.analogueState2.getOrElse(0)
+  }
+
   def patchDevice(deviceState: DeviceState, delta:Boolean):Boolean = {
     val deviceCollection = getDeviceCollection
     val devices:List[Device] = deviceCollection.devices
@@ -108,9 +130,12 @@ trait DeviceCollectionManager{
 
       device.deviceType match {
         case STROBE => {
+
           val aState:Int = getMonitorOrStrobeAnalogueOut(delta, device, deviceState)
+          val aState2:Int = getMonitorOrStrobeAnalogueOut2(delta, device, deviceState)
 
           updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
+          updateTransientAnalogueOutData2(device.copy(analogueState2 = Some(aState2)))
           updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
           // change actor state, perhaps ???
         }

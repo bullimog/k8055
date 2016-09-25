@@ -9,7 +9,7 @@ case class Device(id: String, description: String, deviceType: Int, channel:Int,
                   decimalPlaces:Option[Int] = None, monitorSensor:Option[String] = None,
                   monitorIncreaser:Option[String] = None, monitorDecreaser:Option[String] = None,
                   digitalState:Option[Boolean] = None, flipDigitalMonitorState:Option[Boolean] = Some(false),
-                  analogueState:Option[Int] = None)
+                  analogueState:Option[Int] = None, analogueState2:Option[Int] = None)
 
 object Device {
 //  val TIMER = 0         // e.g. Clock
@@ -34,7 +34,8 @@ object Device {
       (JsPath \ "monitorDecreaser").readNullable[String] and
       (JsPath \ "digitalState").readNullable[Boolean] and
       (JsPath \ "flipDigitalMonitorState").readNullable[Boolean] and
-      (JsPath \ "analogueState").readNullable[Int]
+      (JsPath \ "analogueState").readNullable[Int] and
+    (JsPath \ "analogueState2").readNullable[Int]
     )(Device.apply _)
 
   implicit val deviceWrites = Json.writes[Device]
