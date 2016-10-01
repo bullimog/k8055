@@ -129,10 +129,6 @@ trait DeviceCollectionManager{
       monitorOrStrobeState.analogueState2.getOrElse(0)
   }
 
-//  def atLeast1(in:Int) = {
-//    if(in < 1) 1
-//    else in
-//  }
 
   def patchDevice(deviceState: DeviceState, delta:Boolean):Boolean = {
     val deviceCollection = getDeviceCollection
@@ -140,7 +136,7 @@ trait DeviceCollectionManager{
 
     devices.find(d => d.id == deviceState.id).exists( device => {
 
-      val MINIMUM_TIMEOUT =1
+      val MINIMUM_TIMEOUT = 1
       device.deviceType match {
         case STROBE => {
 
@@ -154,11 +150,10 @@ trait DeviceCollectionManager{
 
               val onSeconds = MonitorManager.getAnalogueOut(device.id)
               val tickInterval = new FiniteDuration(onSeconds, TimeUnit.SECONDS)
-              //println("########### onSeconds=" + onSeconds + "    deviceId=" + device.id)
               system.scheduler.scheduleOnce(tickInterval, strobeActorRef, Start(device.id))
 
               //Add the message to the Map
-              strobeMessagesInQueue += (device.id -> "True")
+              strobeMessagesInQueue += (device.id -> true)
             }
           }
 

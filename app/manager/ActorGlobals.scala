@@ -11,7 +11,7 @@ object ActorGlobals {
 
   lazy val strobeActorRef:ActorRef = system.actorOf(Props(new StrobeActor()), name = "strobeActor")
 
-  var strobeMessagesInQueue:scala.collection.mutable.Map[String, String] = mutable.Map()
+  var strobeMessagesInQueue:scala.collection.mutable.Map[String, Boolean] = mutable.Map()
 }
 
 

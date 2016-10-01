@@ -17,7 +17,7 @@ class StrobeActor extends StrobeActorTrait with Actor{
   def receive = {
     case Start(a) => receivedAStart(a)
     case Stop(a) => receivedAStop(a)
-    case message => Logger.error("unknown message in StrobeActor" + message)
+    case _ => Logger.error("unknown message received by StrobeActor")
   }
 }
 
