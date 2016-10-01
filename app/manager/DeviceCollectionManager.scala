@@ -1,8 +1,15 @@
 package manager
 
+import java.util.concurrent.TimeUnit
+
 import connectors.{Configuration, DeviceConfigIO, K8055Board}
 import model.Device._
 import model.{Device, DeviceCollection, DeviceState}
+import ActorGlobals._
+import akka.actor.Cancellable
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.FiniteDuration
 
 object DeviceCollectionManager extends DeviceCollectionManager with DeviceManager{
   override val deviceConfigIO = DeviceConfigIO
@@ -122,22 +129,43 @@ trait DeviceCollectionManager{
       monitorOrStrobeState.analogueState2.getOrElse(0)
   }
 
+//  def atLeast1(in:Int) = {
+//    if(in < 1) 1
+//    else in
+//  }
+
   def patchDevice(deviceState: DeviceState, delta:Boolean):Boolean = {
     val deviceCollection = getDeviceCollection
     val devices:List[Device] = deviceCollection.devices
 
     devices.find(d => d.id == deviceState.id).exists( device => {
 
+      val MINIMUM_TIMEOUT =1
       device.deviceType match {
         case STROBE => {
 
-          val aState:Int = getMonitorOrStrobeAnalogueOut(delta, device, deviceState)
-          val aState2:Int = getMonitorOrStrobeAnalogueOut2(delta, device, deviceState)
+          val aState:Int = Math.max(MINIMUM_TIMEOUT, getMonitorOrStrobeAnalogueOut(delta, device, deviceState))
+          val aState2:Int = Math.max(MINIMUM_TIMEOUT, getMonitorOrStrobeAnalogueOut2(delta, device, deviceState))
+
+
+
+          deviceState.digitalState.map { enableStrobe =>
+            if(enableStrobe && !strobeMessagesInQueue.contains(device.id)){
+
+              val onSeconds = MonitorManager.getAnalogueOut(device.id)
+              val tickInterval = new FiniteDuration(onSeconds, TimeUnit.SECONDS)
+              //println("########### onSeconds=" + onSeconds + "    deviceId=" + device.id)
+              system.scheduler.scheduleOnce(tickInterval, strobeActorRef, Start(device.id))
+
+              //Add the message to the Map
+              strobeMessagesInQueue += (device.id -> "True")
+            }
+          }
 
           updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
           updateTransientAnalogueOutData2(device.copy(analogueState2 = Some(aState2)))
           updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
-          // change actor state, perhaps ???
+
         }
         case MONITOR => {
           val aState:Int = getMonitorOrStrobeAnalogueOut(delta, device, deviceState)
