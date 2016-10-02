@@ -7,7 +7,7 @@ import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
 import play.api.test.{WithApplication}
 import model.Device._
-import manager.{DeviceCollectionManager, FakeMonitorManager}
+import manager.{DeviceCollectionManager, FakeMonitorAndStrobeManager}
 
 
 @RunWith(classOf[JUnitRunner])
@@ -16,7 +16,7 @@ class DeviceCollectionControllerSpec extends Specification {
   object TestDeviceCollectionManager extends DeviceCollectionManager{
     override val deviceConfigIO = FakeDeviceConfigIO
     override val deviceController = FakeDeviceManager
-    override val monitorManager = FakeMonitorManager
+    override val monitorManager = FakeMonitorAndStrobeManager
     override val configuration = Configuration
     override val k8055Board = FakeK8055Board
 
@@ -120,7 +120,7 @@ class DeviceCollectionControllerSpec extends Specification {
     object TestDeviceCollectionManager2 extends DeviceCollectionManager{
       override val deviceConfigIO = FakeDeviceConfigIO
       override val deviceController = FakeDeviceManager
-      override val monitorManager = FakeMonitorManager
+      override val monitorManager = FakeMonitorAndStrobeManager
       override val configuration = Configuration
       override val k8055Board = FakeK8055Board
 
@@ -209,7 +209,7 @@ class DeviceCollectionControllerSpec extends Specification {
     object TestDeviceCollectionManager3 extends DeviceCollectionManager{
       override val deviceConfigIO = FakeDeviceConfigIO
       override val deviceController = FakeDeviceManager
-      override val monitorManager = FakeMonitorManager
+      override val monitorManager = FakeMonitorAndStrobeManager
       override val configuration = Configuration
       override val k8055Board = FakeK8055Board
 

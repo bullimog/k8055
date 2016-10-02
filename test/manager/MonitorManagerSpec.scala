@@ -32,12 +32,12 @@ class MonitorManagerSpec extends Specification{
     "adds Device state for a new device and record the analogue out for the device" in new WithApplication {
       val testId = "TEST-AO-1"
 
-      val foundMonitor1 = MonitorManager.monitors.find(monitor => monitor.id == testId)
+      val foundMonitor1 = MonitorAndStrobeManager.monitorsAndStrobes.find(monitor => monitor.id == testId)
       foundMonitor1 must equalTo(None)
 
       val testDeviceState = DeviceState(testId, None, Some(11))
-      MonitorManager.setAnalogueOut(testId, 11)
-      val foundMonitor2 = MonitorManager.monitors.find(monitor => monitor.id == testId)
+      MonitorAndStrobeManager.setAnalogueOut(testId, 11)
+      val foundMonitor2 = MonitorAndStrobeManager.monitorsAndStrobes.find(monitor => monitor.id == testId)
       foundMonitor2 must equalTo(Some(testDeviceState))
     }
 
@@ -46,29 +46,29 @@ class MonitorManagerSpec extends Specification{
       val testId = "TEST-AO-2"
       val testAnalogueVal1 = 11
       val testDeviceState1 = DeviceState(testId, None, Some(testAnalogueVal1))
-      MonitorManager.setAnalogueOut(testId, testAnalogueVal1)
-      val foundMonitor1 = MonitorManager.monitors.find(monitor => monitor.id == testId)
+      MonitorAndStrobeManager.setAnalogueOut(testId, testAnalogueVal1)
+      val foundMonitor1 = MonitorAndStrobeManager.monitorsAndStrobes.find(monitor => monitor.id == testId)
       foundMonitor1 must equalTo(Some(testDeviceState1))
-      MonitorManager.getAnalogueOut(testId) must equalTo(testAnalogueVal1)
+      MonitorAndStrobeManager.getAnalogueOut(testId) must equalTo(testAnalogueVal1)
 
       val testAnalogueVal2 = 37
       val testDeviceState2: DeviceState = DeviceState(testId, None, Some(testAnalogueVal2))
-      MonitorManager.setAnalogueOut(testId, testAnalogueVal2)
-      val foundMonitor2: Option[DeviceState] = MonitorManager.monitors.find(monitor => monitor.id == testId)
+      MonitorAndStrobeManager.setAnalogueOut(testId, testAnalogueVal2)
+      val foundMonitor2: Option[DeviceState] = MonitorAndStrobeManager.monitorsAndStrobes.find(monitor => monitor.id == testId)
       foundMonitor2 must equalTo(Some(testDeviceState2))
-      MonitorManager.getAnalogueOut(testId) must equalTo(testAnalogueVal2)
+      MonitorAndStrobeManager.getAnalogueOut(testId) must equalTo(testAnalogueVal2)
     }
 
 
     "adds Device state for a new device and record the digital out for the device" in new WithApplication {
       val testId = "TEST-DO-1"
 
-      val foundMonitor1 = MonitorManager.monitors.find(monitor => monitor.id == testId)
+      val foundMonitor1 = MonitorAndStrobeManager.monitorsAndStrobes.find(monitor => monitor.id == testId)
       foundMonitor1 must equalTo(None)
 
       val testDeviceState = DeviceState(testId, Some(false), None)
-      MonitorManager.setDigitalOut(testId, false)
-      val foundMonitor2 = MonitorManager.monitors.find(monitor => monitor.id == testId)
+      MonitorAndStrobeManager.setDigitalOut(testId, false)
+      val foundMonitor2 = MonitorAndStrobeManager.monitorsAndStrobes.find(monitor => monitor.id == testId)
       foundMonitor2 must equalTo(Some(testDeviceState))
     }
 
@@ -77,17 +77,17 @@ class MonitorManagerSpec extends Specification{
       val testId = "TEST-DO-2"
       val testDigitalVal1 = false
       val testDeviceState1 = DeviceState(testId, Some(testDigitalVal1), None)
-      MonitorManager.setDigitalOut(testId, testDigitalVal1)
-      val foundMonitor1 = MonitorManager.monitors.find(monitor => monitor.id == testId)
+      MonitorAndStrobeManager.setDigitalOut(testId, testDigitalVal1)
+      val foundMonitor1 = MonitorAndStrobeManager.monitorsAndStrobes.find(monitor => monitor.id == testId)
       foundMonitor1 must equalTo(Some(testDeviceState1))
-      MonitorManager.getDigitalOut(testId) must equalTo(testDigitalVal1)
+      MonitorAndStrobeManager.getDigitalOut(testId) must equalTo(testDigitalVal1)
 
       val testDigitalVal2 = true
       val testDeviceState2: DeviceState = DeviceState(testId, Some(testDigitalVal2), None)
-      MonitorManager.setDigitalOut(testId, testDigitalVal2)
-      val foundMonitor2: Option[DeviceState] = MonitorManager.monitors.find(monitor => monitor.id == testId)
+      MonitorAndStrobeManager.setDigitalOut(testId, testDigitalVal2)
+      val foundMonitor2: Option[DeviceState] = MonitorAndStrobeManager.monitorsAndStrobes.find(monitor => monitor.id == testId)
       foundMonitor2 must equalTo(Some(testDeviceState2))
-      MonitorManager.getDigitalOut(testId) must equalTo(testDigitalVal2)
+      MonitorAndStrobeManager.getDigitalOut(testId) must equalTo(testDigitalVal2)
     }
   }
 }

@@ -15,8 +15,8 @@ class StrobeActor extends StrobeActorTrait with Actor{
   override val deviceManager = DeviceManager
 
   def receive = {
-    case Start(a) => receivedAStart(a)
-    case Stop(a) => receivedAStop(a)
+    case Start(strobeId) => receivedAMessage(strobeId, digitalState = true, MonitorAndStrobeManager.getStrobeOnTime)
+    case Stop(strobeId) => receivedAMessage(strobeId, digitalState = false, MonitorAndStrobeManager.getStrobeOffTime)
     case _ => Logger.error("unknown message received by StrobeActor")
   }
 }
@@ -26,34 +26,16 @@ trait StrobeActorTrait{
   val deviceCollectionManager:DeviceCollectionManager
   val deviceManager:DeviceManager
 
-  def receivedAStart(strobeDeviceId: String) = {
-    println("##received a  start")
-    //println("##device is " +MonitorManager.getDigitalOut(strobeDeviceId))
-
-    if(MonitorManager.getDigitalOut(strobeDeviceId)) {
-      findAndSetDigitalOutDevice(strobeDeviceId, outputState = true)
+  def receivedAMessage(strobeDeviceId: String, digitalState: Boolean, delayReadFn:(String => Int)) = {
+    if (MonitorAndStrobeManager.getDigitalOut(strobeDeviceId)) {
+      findAndSetDigitalOutDevice(strobeDeviceId, outputState = digitalState)
 
       deviceCollectionManager.getDevice(strobeDeviceId).map { strobe =>
-        val onSeconds = MonitorManager.getAnalogueOut(strobeDeviceId)
-        val duration = new FiniteDuration(onSeconds, TimeUnit.SECONDS)
-        system.scheduler.scheduleOnce(duration, strobeActorRef, Stop(strobeDeviceId)) //delay, Actor, Message
+        val duration = new FiniteDuration(delayReadFn(strobeDeviceId), TimeUnit.SECONDS)
+        val message = if(digitalState) Stop(strobeDeviceId) else Start(strobeDeviceId)
+        system.scheduler.scheduleOnce(duration, strobeActorRef, message) //delay, Actor, Message
       }
-    }else
-      strobeMessagesInQueue -= strobeDeviceId
-  }
-
-  def receivedAStop(strobeDeviceId: String) = {
-    println("##received a  stop")
-
-    if(MonitorManager.getDigitalOut(strobeDeviceId)) {
-      findAndSetDigitalOutDevice(strobeDeviceId, outputState = false)
-
-      deviceCollectionManager.getDevice(strobeDeviceId).map { strobe =>
-        val offSeconds = MonitorManager.getAnalogueOut2(strobeDeviceId)
-        val duration = new FiniteDuration(offSeconds, TimeUnit.SECONDS)
-        system.scheduler.scheduleOnce(duration, strobeActorRef, Start(strobeDeviceId)) //delay, Actor, Message
-      }
-    }else
+    } else
       strobeMessagesInQueue -= strobeDeviceId
   }
 
