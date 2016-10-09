@@ -3,6 +3,7 @@ package manager
 import java.util.concurrent.TimeUnit
 
 import akka.actor.Actor
+import manager.MonitorAndStrobeManager.{getStrobeOnTime, getStrobeOffTime}
 import model.{Device, DeviceState}
 import play.api.Logger
 import ActorGlobals._
@@ -15,8 +16,8 @@ class StrobeActor extends StrobeActorTrait with Actor{
   override val deviceManager = DeviceManager
 
   def receive = {
-    case Start(strobeId) => receivedAMessage(strobeId, digitalState = true, MonitorAndStrobeManager.getStrobeOnTime)
-    case Stop(strobeId) => receivedAMessage(strobeId, digitalState = false, MonitorAndStrobeManager.getStrobeOffTime)
+    case Start(strobeId) => receivedAStartMessage(strobeId, true)
+    case Stop(strobeId) => receivedAStopMessage(strobeId, false)
     case _ => Logger.error("unknown message received by StrobeActor")
   }
 }
@@ -25,8 +26,12 @@ class StrobeActor extends StrobeActorTrait with Actor{
 trait StrobeActorTrait{
   val deviceCollectionManager:DeviceCollectionManager
   val deviceManager:DeviceManager
+  type strobeTimeFn = String => Int
 
-  def receivedAMessage(strobeDeviceId: String, digitalState: Boolean, delayReadFn:(String => Int)) = {
+  val receivedAStartMessage: (String, Boolean) => Unit = receivedAMessage(getStrobeOnTime)
+  val receivedAStopMessage:  (String, Boolean) => Unit = receivedAMessage(getStrobeOffTime)
+
+  def receivedAMessage(delayReadFn:strobeTimeFn)(strobeDeviceId: String, digitalState: Boolean) :Unit = {
     if (MonitorAndStrobeManager.getDigitalOut(strobeDeviceId)) {
       findAndSetDigitalOutDevice(strobeDeviceId, outputState = digitalState)
 
