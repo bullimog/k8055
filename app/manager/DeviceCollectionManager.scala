@@ -153,7 +153,6 @@ trait DeviceCollectionManager{
 
     devices.find(d => d.id == deviceState.id).exists( device => {
 
-      val MINIMUM_TIMEOUT = 1
       device.deviceType match {
         case STROBE => {
           deviceState.digitalState.map { enableStrobe =>
@@ -166,6 +165,7 @@ trait DeviceCollectionManager{
               strobeMessagesInQueue += (device.id -> true)
             }
           }
+          val MINIMUM_TIMEOUT = 1
           val strobeOnTime:Int = Math.max(MINIMUM_TIMEOUT, getStrobeOnTime(delta, device, deviceState))
           val strobeOffTime:Int = Math.max(MINIMUM_TIMEOUT, getStrobeOffTime(delta, device, deviceState))
 
