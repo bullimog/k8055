@@ -98,6 +98,7 @@ object MonitorAndStrobeManager extends  MonitorAndStrobeManager{
     })
   }
 
+
   override def getDigitalOut(deviceId:String):Boolean = {
     monitorsAndStrobes.find(deviceState => deviceState.id == deviceId).fold(false)(deviceState => {
       deviceState.digitalState.getOrElse(false)
