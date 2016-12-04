@@ -118,31 +118,28 @@ trait DeviceCollectionManager{
 
 
   def getMonitorAnalogueOut(delta: Boolean, monitorOrStrobe: Device, monitorOrStrobeState: DeviceState) : Int = {
-    if (delta) {
-      val aRawState: Int = monitorManager.getAnalogueOut(monitorOrStrobe.id)
+    val aRawState: Int = monitorManager.getAnalogueOut(monitorOrStrobe.id)
+    if (delta)
       aRawState + monitorOrStrobeState.analogueState.getOrElse(0)
-    }
     else
-      monitorOrStrobeState.analogueState.getOrElse(0)
+      monitorOrStrobeState.analogueState.getOrElse(aRawState)
   }
 
 
   def getStrobeOnTime(delta: Boolean, strobe: Device, strobeState: DeviceState) : Int = {
-    if (delta) {
-      val aRawState: Int = monitorManager.getStrobeOnTime(strobe.id)
+    val aRawState: Int = monitorManager.getStrobeOnTime(strobe.id)
+    if (delta)
       aRawState + strobeState.strobeOnTime.getOrElse(0)
-    }
     else
-      strobeState.strobeOnTime.getOrElse(0)
+      strobeState.strobeOnTime.getOrElse(aRawState)
   }
 
   def getStrobeOffTime(delta: Boolean, strobe: Device, strobeState: DeviceState) : Int = {
-    if (delta) {
-      val aRawState: Int = monitorManager.getStrobeOffTime(strobe.id)
+    val aRawState: Int = monitorManager.getStrobeOffTime(strobe.id)
+    if (delta)
       aRawState + strobeState.strobeOffTime.getOrElse(0)
-    }
     else
-      strobeState.strobeOffTime.getOrElse(0)
+      strobeState.strobeOffTime.getOrElse(aRawState)
   }
 
 
@@ -166,6 +163,7 @@ trait DeviceCollectionManager{
             }
           }
           val MINIMUM_TIMEOUT = 1
+
           val strobeOnTime:Int = Math.max(MINIMUM_TIMEOUT, getStrobeOnTime(delta, device, deviceState))
           val strobeOffTime:Int = Math.max(MINIMUM_TIMEOUT, getStrobeOffTime(delta, device, deviceState))
 
