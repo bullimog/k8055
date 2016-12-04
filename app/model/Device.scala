@@ -9,15 +9,16 @@ case class Device(id: String, description: String, deviceType: Int, channel:Int,
                   decimalPlaces:Option[Int] = None, monitorSensor:Option[String] = None,
                   monitorIncreaser:Option[String] = None, monitorDecreaser:Option[String] = None,
                   digitalState:Option[Boolean] = None, flipDigitalMonitorState:Option[Boolean] = Some(false),
-                  analogueState:Option[Int] = None)
+                  analogueState:Option[Int] = None, strobeOnTime:Option[Int] = None, strobeOffTime:Option[Int] = None)
 
 object Device {
-//  val TIMER = 0         // e.g. Clock
+//  val TIMER = 0       // e.g. Clock
   val ANALOGUE_IN = 1   // e.g. Thermometer
   val ANALOGUE_OUT = 2  // e.g. Heater or Cooler
   val DIGITAL_IN = 3    // e.g. Button or Switch
   val DIGITAL_OUT = 4   // e.g. Pump
   val MONITOR = 5       // e.g. Thermostat or overflow guard
+  val STROBE = 6        // e.g. Pump pulser
 
   implicit val deviceReads: Reads[Device] = (
     (JsPath \ "id").read[String] and
@@ -33,7 +34,9 @@ object Device {
       (JsPath \ "monitorDecreaser").readNullable[String] and
       (JsPath \ "digitalState").readNullable[Boolean] and
       (JsPath \ "flipDigitalMonitorState").readNullable[Boolean] and
-      (JsPath \ "analogueState").readNullable[Int]
+      (JsPath \ "analogueState").readNullable[Int] and
+      (JsPath \ "strobeOnTime").readNullable[Int] and
+      (JsPath \ "strobeOffTime").readNullable[Int]
     )(Device.apply _)
 
   implicit val deviceWrites = Json.writes[Device]

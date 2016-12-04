@@ -111,7 +111,13 @@
     "deviceType" : 5,
     "channel" : 0,
     "monitorSensor" : "DI-1",
-    "monitorIncreaser" : "DO-4",
+    "monitorIncreaser" : "ST-1",
     "flipDigitalMonitorState" : true
+  }, {
+    "id" : "ST-1",
+    "description" : "Wort Pump Pulser",
+    "deviceType" : 6,
+    "channel" : 0,
+    "monitorIncreaser" : "DO-4"
   } ]
 }

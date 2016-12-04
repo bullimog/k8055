@@ -22,7 +22,7 @@ object FakeDeviceCollectionManager extends DeviceCollectionManager{
   var pumpState:Boolean = false
   var flipPumpState = false
 
-  var lastDeviceState: DeviceState = null
+  var lastDeviceState: DeviceState = _
 
   override def getDeviceCollection:DeviceCollection ={
     val pump = Device("TEST-DO-1", "test-pump", DIGITAL_OUT, 1, digitalState = Some(pumpState))

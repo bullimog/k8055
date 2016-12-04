@@ -70,18 +70,19 @@ trait MonitorActorTrait{
     }
   }
 
-  private[manager] def updateAnalogueOutputDevice(outputDevice:Device, outputVal:Int) = {
+  private[manager] def updateAnalogueOutputDevice(outputDevice:Device, outputVal:Int):Boolean = {
     val outputDeviceState = DeviceState(outputDevice.id, None, Some(outputVal))
     deviceCollectionController.patchDevice(outputDeviceState, delta = false)
   }
 
-
-  private[manager] def monitorDigitalIn(activeMonitor: Device, digitalSensor:Device) = {
+  private[manager] def monitorDigitalIn(activeMonitor: Device, digitalSensor:Device):Unit = {
     for {
       increaser <- activeMonitor.monitorIncreaser.flatMap(id => deviceCollectionController.getDevice(id))
     } yield {
       if(increaser.deviceType == Device.DIGITAL_OUT) {
         monitorDigitalInToDigitalOut(activeMonitor, digitalSensor, increaser)
+      } else if(increaser.deviceType == Device.STROBE) {
+        monitorDigitalInToStrobe(activeMonitor, digitalSensor, increaser)
       }
     }
   }
@@ -99,6 +100,18 @@ trait MonitorActorTrait{
     deviceCollectionController.patchDevice(outputDeviceState, delta = false)
   }
 
+  private[manager] def monitorDigitalInToStrobe(activeMonitor:Device, digitalSensor:Device, strobe:Device) = {
+    val flipDigital = activeMonitor.flipDigitalMonitorState.fold(false)(fd => fd)
+    digitalSensor.digitalState.fold() { sensorDigitalState => {
+      val digitalState:Boolean = if (flipDigital) !sensorDigitalState else sensorDigitalState
+      updateStrobeDevice(strobe, digitalState)
+    }}
+  }
+
+  private[manager] def updateStrobeDevice(strobe:Device, outputState:Boolean) = {
+    val outputDeviceState = DeviceState(strobe.id, Some(outputState), None)
+    deviceCollectionController.patchDevice(outputDeviceState, delta = true)
+  }
 
 
   private[manager] def calculateOutputSetting(measurementDiff: Int): Int ={

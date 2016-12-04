@@ -40,7 +40,14 @@ trait DeviceManager {
   }
 
   def readAndPopulateMonitor(device: Device):Device = {
-    device.copy(digitalState = Some(MonitorManager.getDigitalOut(device.id)),
-      analogueState = Some(MonitorManager.getAnalogueOut(device.id)))
+    device.copy(digitalState = Some(MonitorAndStrobeManager.getDigitalOut(device.id)),
+      analogueState = Some(MonitorAndStrobeManager.getAnalogueOut(device.id)))
+  }
+
+  def readAndPopulateStrobe(device: Device):Device = {
+    device.copy(digitalState = Some(MonitorAndStrobeManager.getDigitalOut(device.id)),
+      strobeOnTime = Some(MonitorAndStrobeManager.getStrobeOnTime(device.id)),
+      strobeOffTime = Some(MonitorAndStrobeManager.getStrobeOffTime(device.id))
+    )
   }
 }

@@ -1,13 +1,19 @@
 package manager
 
+import java.util.concurrent.TimeUnit
+
 import connectors.{Configuration, DeviceConfigIO, K8055Board}
 import model.Device._
 import model.{Device, DeviceCollection, DeviceState}
+import ActorGlobals._
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.FiniteDuration
 
 object DeviceCollectionManager extends DeviceCollectionManager with DeviceManager{
   override val deviceConfigIO = DeviceConfigIO
   override val deviceController = DeviceManager
-  override val monitorManager = MonitorManager
+  override val monitorManager = MonitorAndStrobeManager
   override val configuration = Configuration
   override val k8055Board = K8055Board
 }
@@ -16,7 +22,7 @@ trait DeviceCollectionManager{
 
   val deviceConfigIO:DeviceConfigIO
   val deviceController:DeviceManager
-  val monitorManager:MonitorManager
+  val monitorManager:MonitorAndStrobeManager
   val configuration:Configuration
   val k8055Board:K8055Board
 
@@ -37,6 +43,8 @@ trait DeviceCollectionManager{
     val populatedDevices = deviceCollection.devices.map(device =>
       if(device.deviceType == MONITOR)
         deviceController.readAndPopulateMonitor(device)
+      else if(device.deviceType == STROBE)
+        deviceController.readAndPopulateStrobe(device)
       else
         deviceController.readAndPopulateDevice(device)
     )
@@ -53,6 +61,8 @@ trait DeviceCollectionManager{
 
     updateTransientDigitalOutData(device)
     updateTransientAnalogueOutData(device)
+    //updateTransientStrobeOnTime(device)
+    //updateTransientStrobeOffTime(device)
     putDeviceCollection(dc)
   }
 
@@ -68,6 +78,11 @@ trait DeviceCollectionManager{
         true
       }
       case (Device.MONITOR, None) => true
+      case (Device.STROBE, Some(dState)) => {
+        monitorManager.setDigitalOut(device.id, dState)
+        true
+      }
+      case (Device.STROBE, None) => true
       case _ => false
     }
   }
@@ -83,23 +98,84 @@ trait DeviceCollectionManager{
     }
   }
 
+  def updateTransientStrobeOnTime(device: Device):Boolean = {
+    (device.deviceType, device.strobeOnTime) match{
+      case (Device.STROBE, Some(aState)) => {
+        monitorManager.setStrobeOnTime(device.id, aState)
+      }
+      case _ => false
+    }
+  }
+
+  def updateTransientStrobeOffTime(device: Device):Boolean = {
+    (device.deviceType, device.strobeOffTime) match{
+      case (Device.STROBE, Some(aState)) => {
+        monitorManager.setStrobeOffTime(device.id, aState)
+      }
+      case _ => false
+    }
+  }
+
+
+  def getMonitorAnalogueOut(delta: Boolean, monitorOrStrobe: Device, monitorOrStrobeState: DeviceState) : Int = {
+    if (delta) {
+      val aRawState: Int = monitorManager.getAnalogueOut(monitorOrStrobe.id)
+      aRawState + monitorOrStrobeState.analogueState.getOrElse(0)
+    }
+    else
+      monitorOrStrobeState.analogueState.getOrElse(0)
+  }
+
+
+  def getStrobeOnTime(delta: Boolean, strobe: Device, strobeState: DeviceState) : Int = {
+    if (delta) {
+      val aRawState: Int = monitorManager.getStrobeOnTime(strobe.id)
+      aRawState + strobeState.strobeOnTime.getOrElse(0)
+    }
+    else
+      strobeState.strobeOnTime.getOrElse(0)
+  }
+
+  def getStrobeOffTime(delta: Boolean, strobe: Device, strobeState: DeviceState) : Int = {
+    if (delta) {
+      val aRawState: Int = monitorManager.getStrobeOffTime(strobe.id)
+      aRawState + strobeState.strobeOffTime.getOrElse(0)
+    }
+    else
+      strobeState.strobeOffTime.getOrElse(0)
+  }
 
 
   def patchDevice(deviceState: DeviceState, delta:Boolean):Boolean = {
+
     val deviceCollection = getDeviceCollection
     val devices:List[Device] = deviceCollection.devices
 
     devices.find(d => d.id == deviceState.id).exists( device => {
 
       device.deviceType match {
-        case MONITOR => {
-          val aState:Int = if (delta) {
-            val aRawState: Int = monitorManager.getAnalogueOut(device.id)
-            aRawState + deviceState.analogueState.getOrElse(0)
-          }
-          else
-            deviceState.analogueState.getOrElse(0)
+        case STROBE => {
+          deviceState.digitalState.map { enableStrobe =>
+            if(enableStrobe && !strobeMessagesInQueue.contains(device.id)){
 
+              val onSeconds = MonitorAndStrobeManager.getStrobeOnTime(device.id)
+              val tickInterval = new FiniteDuration(onSeconds, TimeUnit.SECONDS)
+              system.scheduler.scheduleOnce(tickInterval, strobeActorRef, Start(device.id))
+
+              strobeMessagesInQueue += (device.id -> true)
+            }
+          }
+          val MINIMUM_TIMEOUT = 1
+          val strobeOnTime:Int = Math.max(MINIMUM_TIMEOUT, getStrobeOnTime(delta, device, deviceState))
+          val strobeOffTime:Int = Math.max(MINIMUM_TIMEOUT, getStrobeOffTime(delta, device, deviceState))
+
+          updateTransientStrobeOnTime(device.copy(strobeOnTime = Some(strobeOnTime)))
+          updateTransientStrobeOffTime(device.copy(strobeOffTime = Some(strobeOffTime)))
+          updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
+
+        }
+        case MONITOR => {
+          val aState:Int = getMonitorAnalogueOut(delta, device, deviceState)
           updateTransientAnalogueOutData(device.copy(analogueState = Some(aState)))
           updateTransientDigitalOutData(device.copy(digitalState = deviceState.digitalState))
         }
