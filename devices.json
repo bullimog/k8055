@@ -1,123 +1,143 @@
 {
-  "name" : "Brewing",
-  "description" : "Setup for mash and boil",
-  "devices" : [ {
-    "id" : "AI-1",
-    "description" : "Mash Thermometer",
-    "deviceType" : 1,
-    "channel" : 1,
-    "units" : "°c",
-    "conversionFactor" : 0.392156862,
-    "conversionOffset" : 0,
-    "decimalPlaces" : 2
-  }, {
-    "id" : "AI-2",
-    "description" : "Boil Thermometer",
-    "deviceType" : 1,
-    "channel" : 2,
-    "units" : "°c",
-    "conversionFactor" : 0.392156862,
-    "conversionOffset" : 0,
-    "decimalPlaces" : 2
-  }, {
-    "id" : "DO-1",
-    "description" : "Hopper",
-    "deviceType" : 4,
-    "channel" : 1
-  }, {
-    "id" : "DO-2",
-    "description" : "Chiller",
-    "deviceType" : 4,
-    "channel" : 2
-  }, {
-    "id" : "DO-3",
-    "description" : "Heat Select",
-    "deviceType" : 4,
-    "channel" : 3
-  }, {
-    "id" : "DO-4",
-    "description" : "Mash Valve",
-    "deviceType" : 4,
-    "channel" : 4
-  }, {
-    "id" : "DO-5",
-    "description" : "Boil Valve",
-    "deviceType" : 4,
-    "channel" : 5
-  }, {
-    "id" : "DO-6",
-    "description" : "Wort Pump",
-    "deviceType" : 4,
-    "channel" : 6
-  }, {
-    "id" : "DO-7",
-    "description" : "Mash Pump",
-    "deviceType" : 4,
-    "channel" : 7
-  }, {
-    "id" : "DO-8",
-    "description" : "Boil Pump",
-    "deviceType" : 4,
-    "channel" : 8
-  }, {
-    "id" : "AO-1",
-    "description" : "Heat Triac",
-    "deviceType" : 2,
-    "channel" : 1,
-    "units" : "%",
-    "conversionFactor" : 0.392156862,
-    "decimalPlaces" : 1
-  }, {
-    "id" : "DI-1",
-    "description" : "Mash Overflow",
-    "deviceType" : 3,
-    "channel" : 1
-  }, {
-    "id" : "DI-2",
-    "description" : "Mash Underflow",
-    "deviceType" : 3,
-    "channel" : 2
-  }, {
-    "id" : "DI-3",
-    "description" : "Wort Overflow",
-    "deviceType" : 3,
-    "channel" : 3
-  }, {
-    "id" : "DI-4",
-    "description" : "Wort underflow",
-    "deviceType" : 3,
-    "channel" : 4
-  }, {
-    "id" : "MO-1",
-    "description" : "Mash thermostat",
-    "deviceType" : 5,
-    "channel" : 0,
-    "units" : "°c",
-    "conversionFactor" : 0.392156862,
-    "decimalPlaces" : 1,
-    "monitorSensor" : "AI-1",
-    "monitorIncreaser" : "AO-1"
-  }, {
-    "id" : "MO-2",
-    "description" : "Mash recirculate & monitor overflow",
-    "deviceType" : 5,
-    "channel" : 0,
-    "monitorSensor" : "DI-1",
-    "monitorIncreaser" : "DO-7",
-    "flipDigitalMonitorState" : true
-  }, {
-    "id" : "MO-3",
-    "description" : "Mash sparge & monitor overflow",
-    "deviceType" : 5,
-    "channel" : 0,
-    "monitorSensor" : "DI-1",
-    "monitorIncreaser" : "DO-8",
-    "flipDigitalMonitorState" : true
-  }, {
-    "id" : "ST-1",
-    "description" : "Mash Pump Pulser",
-    "deviceType" : 6,
-    "channel" : 0,
-    "monitorIncreaser" : "DO-7"
-  } ]
+  "name": "Brewing",
+  "description": "Setup for mash and boil",
+  "devices": [
+    {
+      "id": "AO-1",
+      "description": "Heat Triac",
+      "deviceType": 2,
+      "channel": 1,
+      "units": "%",
+      "conversionFactor": 0.392156862,
+      "decimalPlaces": 1
+    },
+    {
+      "id": "DO-1",
+      "description": "Hopper",
+      "deviceType": 4,
+      "channel": 1
+    },
+    {
+      "id": "DO-2",
+      "description": "Chiller",
+      "deviceType": 4,
+      "channel": 2
+    },
+    {
+      "id": "DO-3",
+      "description": "Heat Select",
+      "deviceType": 4,
+      "channel": 3
+    },
+    {
+      "id": "DO-4",
+      "description": "Mash Valve",
+      "deviceType": 4,
+      "channel": 4
+    },
+    {
+      "id": "DO-5",
+      "description": "Boil Valve",
+      "deviceType": 4,
+      "channel": 5
+    },
+    {
+      "id": "DO-6",
+      "description": "Wort Pump",
+      "deviceType": 4,
+      "channel": 6
+    },
+    {
+      "id": "DO-7",
+      "description": "Mash Pump",
+      "deviceType": 4,
+      "channel": 7
+    },
+    {
+      "id": "DO-8",
+      "description": "Boil Pump",
+      "deviceType": 4,
+      "channel": 8
+    },
+    {
+      "id": "DI-1",
+      "description": "Mash Overflow",
+      "deviceType": 3,
+      "channel": 1
+    },
+    {
+      "id": "DI-2",
+      "description": "Mash Underflow",
+      "deviceType": 3,
+      "channel": 2
+    },
+    {
+      "id": "DI-3",
+      "description": "Wort Overflow",
+      "deviceType": 3,
+      "channel": 3
+    },
+    {
+      "id": "DI-4",
+      "description": "Wort underflow",
+      "deviceType": 3,
+      "channel": 4
+    },
+    {
+      "id": "AI-1",
+      "description": "Mash Thermometer",
+      "deviceType": 1,
+      "channel": 1,
+      "units": "°c",
+      "conversionFactor": 0.392156862,
+      "conversionOffset": 0,
+      "decimalPlaces": 2
+    },
+    {
+      "id": "AI-2",
+      "description": "Boil Thermometer",
+      "deviceType": 1,
+      "channel": 2,
+      "units": "°c",
+      "conversionFactor": 0.392156862,
+      "conversionOffset": 0,
+      "decimalPlaces": 2
+    },
+    {
+      "id": "MO-1",
+      "description": "Mash thermostat",
+      "deviceType": 5,
+      "channel": 0,
+      "units": "°c",
+      "conversionFactor": 0.392156862,
+      "decimalPlaces": 1,
+      "monitorSensor": "AI-1",
+      "monitorIncreaser": "AO-1"
+    },
+    {
+      "id": "MO-2",
+      "description": "Mash recirculate & monitor overflow",
+      "deviceType": 5,
+      "channel": 0,
+      "monitorSensor": "DI-1",
+      "monitorIncreaser": "DO-7",
+      "flipDigitalMonitorState": true
+    },
+    {
+      "id": "MO-3",
+      "description": "Sparge water & monitor overflow",
+      "deviceType": 5,
+      "channel": 0,
+      "monitorSensor": "DI-1",
+      "monitorIncreaser": "DO-8",
+      "flipDigitalMonitorState": true
+    },
+    {
+      "id": "ST-1",
+      "description": "Mash Pump Pulser",
+      "deviceType": 6,
+      "channel": 0,
+      "monitorIncreaser": "DO-7"
+    }
+  ]
 }
