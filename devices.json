@@ -37,7 +37,7 @@
     },
     {
       "id": "DO-5",
-      "description": "Boil Valve",
+      "description": "Boiler Valve",
       "deviceType": 4,
       "channel": 5
     },
