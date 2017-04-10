@@ -88,7 +88,7 @@ trait MonitorActorTrait{
   }
 
   private[manager] def monitorDigitalInToDigitalOut(activeMonitor:Device, digitalSensor:Device, increaser:Device) = {
-    val flipDigital = activeMonitor.flipDigitalMonitorState.fold(false)(fd => fd)
+    val flipDigital = activeMonitor.flipDigitalState.fold(false)(fd => fd)
     digitalSensor.digitalState.fold() { sensorDigitalState => {
       val digitalState:Boolean = if (flipDigital) !sensorDigitalState else sensorDigitalState
       updateDigitalOutputDevice(increaser, digitalState)
@@ -101,7 +101,7 @@ trait MonitorActorTrait{
   }
 
   private[manager] def monitorDigitalInToStrobe(activeMonitor:Device, digitalSensor:Device, strobe:Device) = {
-    val flipDigital = activeMonitor.flipDigitalMonitorState.fold(false)(fd => fd)
+    val flipDigital = activeMonitor.flipDigitalState.fold(false)(fd => fd)
     digitalSensor.digitalState.fold() { sensorDigitalState => {
       val digitalState:Boolean = if (flipDigital) !sensorDigitalState else sensorDigitalState
       updateStrobeDevice(strobe, digitalState)

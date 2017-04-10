@@ -63,7 +63,8 @@
       "id": "DI-1",
       "description": "Mash Overflow",
       "deviceType": 3,
-      "channel": 1
+      "channel": 1,
+      "flipDigitalState": true
     },
     {
       "id": "DI-2",
@@ -121,7 +122,7 @@
       "channel": 0,
       "monitorSensor": "DI-1",
       "monitorIncreaser": "DO-7",
-      "flipDigitalMonitorState": true
+      "flipDigitalState": true
     },
     {
       "id": "MO-3",
@@ -130,7 +131,7 @@
       "channel": 0,
       "monitorSensor": "DI-1",
       "monitorIncreaser": "DO-8",
-      "flipDigitalMonitorState": true
+      "flipDigitalState": true
     },
     {
       "id": "ST-1",

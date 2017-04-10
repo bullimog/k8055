@@ -32,7 +32,10 @@ trait DeviceManager {
   }
 
   def readAndPopulateDigitalIn(device: Device):Device = {
-    device.copy(digitalState = Some(k8055Board.getDigitalIn(device.channel)))
+    val flipDigital = device.flipDigitalState.fold(false)(fd => fd)
+    val digitalRead = k8055Board.getDigitalIn(device.channel)
+    val digitalState:Boolean = if (flipDigital) !digitalRead else digitalRead
+    device.copy(digitalState = Some(digitalState))
   }
 
   def readAndPopulateDigitalOut(device: Device):Device = {

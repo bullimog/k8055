@@ -8,7 +8,7 @@ case class Device(id: String, description: String, deviceType: Int, channel:Int,
                   conversionFactor:Option[Double] = None, conversionOffset:Option[Double] = None,
                   decimalPlaces:Option[Int] = None, monitorSensor:Option[String] = None,
                   monitorIncreaser:Option[String] = None, monitorDecreaser:Option[String] = None,
-                  digitalState:Option[Boolean] = None, flipDigitalMonitorState:Option[Boolean] = Some(false),
+                  digitalState:Option[Boolean] = None, flipDigitalState:Option[Boolean] = Some(false),
                   analogueState:Option[Int] = None, strobeOnTime:Option[Int] = None, strobeOffTime:Option[Int] = None)
 
 object Device {
@@ -33,7 +33,7 @@ object Device {
       (JsPath \ "monitorIncreaser").readNullable[String] and
       (JsPath \ "monitorDecreaser").readNullable[String] and
       (JsPath \ "digitalState").readNullable[Boolean] and
-      (JsPath \ "flipDigitalMonitorState").readNullable[Boolean] and
+      (JsPath \ "flipDigitalState").readNullable[Boolean] and
       (JsPath \ "analogueState").readNullable[Int] and
       (JsPath \ "strobeOnTime").readNullable[Int] and
       (JsPath \ "strobeOffTime").readNullable[Int]
