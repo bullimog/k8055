@@ -9,80 +9,93 @@
       "channel": 1,
       "units": "%",
       "conversionFactor": 0.392156862,
-      "decimalPlaces": 1
+      "decimalPlaces": 1,
+      "icon": "control"
     },
     {
       "id": "DO-1",
       "description": "Hopper",
       "deviceType": 4,
-      "channel": 1
+      "channel": 1,
+      "icon": "hopper"
     },
     {
       "id": "DO-2",
       "description": "Chiller",
       "deviceType": 4,
-      "channel": 2
+      "channel": 2,
+      "icon": "chiller"
     },
     {
       "id": "DO-3",
       "description": "Heat Select",
       "deviceType": 4,
-      "channel": 3
+      "channel": 3,
+      "icon": "switch"
     },
     {
       "id": "DO-4",
       "description": "Mash Valve",
       "deviceType": 4,
-      "channel": 4
+      "channel": 4,
+      "icon": "valve"
     },
     {
       "id": "DO-5",
       "description": "Boiler Valve",
       "deviceType": 4,
-      "channel": 5
+      "channel": 5,
+      "icon": "valve"
     },
     {
       "id": "DO-6",
       "description": "Wort Pump",
       "deviceType": 4,
-      "channel": 6
+      "channel": 6,
+      "icon": "pump"
     },
     {
       "id": "DO-7",
       "description": "Mash Pump",
       "deviceType": 4,
-      "channel": 7
+      "channel": 7,
+      "icon": "pump"
     },
     {
       "id": "DO-8",
       "description": "Boil Pump",
       "deviceType": 4,
-      "channel": 8
+      "channel": 8,
+      "icon": "pump"
     },
     {
       "id": "DI-1",
       "description": "Mash Overflow",
       "deviceType": 3,
       "channel": 1,
-      "flipDigitalState": true
+      "flipDigitalState": true,
+      "icon": "overflow"
     },
     {
       "id": "DI-2",
       "description": "Mash Underflow",
       "deviceType": 3,
-      "channel": 2
+      "channel": 2,
+      "icon": "underflow"
     },
     {
       "id": "DI-3",
       "description": "Wort Overflow",
       "deviceType": 3,
-      "channel": 3
+      "channel": 3,
+      "icon": "overflow"
     },
     {
       "id": "DI-4",
       "description": "Wort underflow",
       "deviceType": 3,
-      "channel": 4
+      "channel": 4,
+      "icon": "underflow"
     },
     {
       "id": "AI-1",
@@ -92,7 +105,8 @@
       "units": "°c",
       "conversionFactor": 0.392156862,
       "conversionOffset": 0,
-      "decimalPlaces": 2
+      "decimalPlaces": 2,
+      "icon": "thermometer"
     },
     {
       "id": "AI-2",
@@ -102,7 +116,8 @@
       "units": "°c",
       "conversionFactor": 0.392156862,
       "conversionOffset": 0,
-      "decimalPlaces": 2
+      "decimalPlaces": 2,
+      "icon": "thermometer"
     },
     {
       "id": "MO-1",
@@ -113,7 +128,8 @@
       "conversionFactor": 0.392156862,
       "decimalPlaces": 1,
       "monitorSensor": "AI-1",
-      "monitorIncreaser": "AO-1"
+      "monitorIncreaser": "AO-1",
+      "icon": "thermometer"
     },
     {
       "id": "MO-2",
@@ -122,7 +138,8 @@
       "channel": 0,
       "monitorSensor": "DI-1",
       "monitorIncreaser": "DO-7",
-      "flipDigitalState": true
+      "flipDigitalState": true,
+      "icon": "overflow"
     },
     {
       "id": "MO-3",
@@ -131,14 +148,16 @@
       "channel": 0,
       "monitorSensor": "DI-1",
       "monitorIncreaser": "DO-8",
-      "flipDigitalState": true
+      "flipDigitalState": true,
+      "icon": "overflow"
     },
     {
       "id": "ST-1",
       "description": "Mash Pump Pulser",
       "deviceType": 6,
       "channel": 0,
-      "monitorIncreaser": "DO-7"
+      "monitorIncreaser": "DO-7",
+      "icon": "pump"
     }
   ]
 }
