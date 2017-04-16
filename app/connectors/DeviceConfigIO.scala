@@ -20,6 +20,7 @@ trait DeviceConfigIO {
     try{
       val source = Source.fromFile(fileName, "UTF-8")
       val json: JsValue = Json.parse(source.mkString)
+      source.close()
       parseDeviceCollection(json)
     }catch{
       case e:FileNotFoundException => None

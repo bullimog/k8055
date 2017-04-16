@@ -3,6 +3,7 @@ package connectors
 
 import play.Logger
 import util.Util._
+import org.joda.time
 
 object K8055Board extends K8055Board
 
@@ -26,7 +27,7 @@ trait K8055Board{
   val LOWEST_BIT = 1
   val HIGHEST_BIT = 8
 
-  val retryLimit = 3
+  val retryLimit = 20
   val defaultValues = "0;0;0;0;0;0"
   val expectedValCount = 6
 
@@ -194,6 +195,7 @@ trait K8055Board{
         val output = result.!!
         if (output.indexOf("Could not open the k8055") >= 0) {
           //Logger.error("#### Communication with k8055 failed: " + output)
+          Thread.sleep(100)
           tryCommand(command, tries - 1)
         }
         else output
@@ -206,7 +208,8 @@ trait K8055Board{
       }
     }
     else {
-      Logger.error(s"#### Tried $retryLimit times, but couldn't get a good response from k8055")
+      val dt = new time.LocalDate().toDateTime(new time.LocalTime())
+      Logger.error(s"#### $dt ### Tried $retryLimit times, but couldn't get a good response from k8055")
       defaultValues
     }
   }

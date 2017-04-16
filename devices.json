@@ -81,6 +81,7 @@
       "description": "Mash Underflow",
       "deviceType": 3,
       "channel": 2,
+      "flipDigitalState": true,
       "icon": "underflow"
     },
     {
@@ -95,6 +96,7 @@
       "description": "Wort underflow",
       "deviceType": 3,
       "channel": 4,
+      "flipDigitalState": true,
       "icon": "underflow"
     },
     {
