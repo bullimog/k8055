@@ -77,14 +77,6 @@
       "icon": "overflow"
     },
     {
-      "id": "DI-2",
-      "description": "Mash Underflow",
-      "deviceType": 3,
-      "channel": 2,
-      "flipDigitalState": true,
-      "icon": "underflow"
-    },
-    {
       "id": "DI-3",
       "description": "Wort Overflow",
       "deviceType": 3,
@@ -107,7 +99,7 @@
       "units": "°c",
       "conversionFactor": 0.392156862,
       "conversionOffset": 0,
-      "decimalPlaces": 2,
+      "decimalPlaces": 1,
       "icon": "thermometer"
     },
     {
@@ -118,7 +110,7 @@
       "units": "°c",
       "conversionFactor": 0.392156862,
       "conversionOffset": 0,
-      "decimalPlaces": 2,
+      "decimalPlaces": 1,
       "icon": "thermometer"
     },
     {
